@@ -8,7 +8,6 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
-import com.pelico.aicamera.engine.CompositionBox
 
 object ImageSaver {
 
@@ -43,22 +42,6 @@ object ImageSaver {
             uri
         } catch (e: Exception) {
             Log.w("ImageSaver", "保存失败", e)
-            null
-        }
-    }
-
-    /** 按归一化构图框裁图 */
-    fun crop(source: Bitmap, box: CompositionBox): Bitmap? {
-        val w = source.width
-        val h = source.height
-        val left = (box.left * w).toInt().coerceIn(0, w - 1)
-        val top = (box.top * h).toInt().coerceIn(0, h - 1)
-        val right = (box.right * w).toInt().coerceIn(left + 1, w)
-        val bottom = (box.bottom * h).toInt().coerceIn(top + 1, h)
-        return try {
-            Bitmap.createBitmap(source, left, top, right - left, bottom - top)
-        } catch (e: Exception) {
-            Log.w("ImageSaver", "裁剪失败", e)
             null
         }
     }

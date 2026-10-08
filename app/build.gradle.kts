@@ -17,7 +17,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // 只打主流 ABI，否则 ONNX Runtime + TFLite 的 .so 会让 APK 膨胀到 40MB+
+        // 只打主流 ABI，避免 TFLite 的 .so 让 APK 膨胀
         ndk {
             abiFilters += listOf("arm64-v8a", "armeabi-v7a")
         }
@@ -86,9 +86,9 @@ dependencies {
     implementation("androidx.camera:camera-view:$cameraX")
 
     // ---- 端侧推理 ----
-    // Adacrop 构图裁剪模型（ONNX）
-    implementation("com.microsoft.onnxruntime:onnxruntime-android:1.19.2")
-    // NIMA 美学评分模型（TFLite）
+    // 全部模型都是 tflite，统一走 TFLite：
+    //   Places365 场景分类 + NIMA 美学评分
+    // 去掉 ONNX Runtime 后 APK 少了约 30 MB
     implementation("org.tensorflow:tensorflow-lite:2.16.1")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")

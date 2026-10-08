@@ -1,88 +1,103 @@
-# AiCamera — 端侧 AI 构图助手
+# AiCamera · 场景驱动的拍照姿势助手
 
-给不支持厂商「AI 构图」的手机，做一个实时取景引导 App。全部推理在端侧完成，不联网、不上传照片。
+端侧推理，不联网、不上传任何图片。
 
-## 它做什么
+## 这个 App 解决什么
 
-| 模式 | 说明 |
-|---|---|
-| **取景引导** | 实时分析取景画面，画出建议构图框，用箭头告诉你「往左移 / 拉近」，对齐后提示可以按快门 |
-| **拍后分析** | 从相册选一张已拍的照片，给出建议裁剪区域、美学评分，可一键保存裁剪结果 |
-| **性能实测** | 在当前机型上实测两个模型的单帧延迟，用来验证你的手机跑不跑得动 |
+不是"让 AI 猜一个构图框让你去追"，而是：
+
+> 识别你眼前的场景 → 告诉你人该站哪、朝哪、相机该举多高 → 你照着摆，然后按快门。
+
+不判断人的姿势，也就不存在姿态估计不稳的问题。输出是确定性的几何建议，
+不会因为模型抖动而乱跳。
+
+## 三个页面
+
+**取景推荐** — 实时取景，每 1.5 秒识别一次场景（场景变化很慢，不需要高帧率）。
+画面上叠加：三分参考线、站位虚线框、人形剪影、水平仪。
+下方卡片给出当前场景最匹配的姿势：朝向、机位、分步动作、要点提示。
+可左右切换 Top 3，对齐后按快门。
+
+**姿势库** — 45 条姿势模板按 12 个场景大类分类浏览，可以手动指定一条，
+切回取景页照着摆。
+
+**拍后分析** — 从相册选一张已拍的照片，识别它的场景、给出美学评分，
+然后回答"下次在这儿该怎么拍"。
+
+**性能实测** — 在你机器上真跑两个模型，给出实际单帧延迟。
 
 ## 技术栈
 
-- Kotlin + Jetpack Compose + Material 3
-- CameraX（Preview + ImageAnalysis，RGBA_8888 直出）
-- ONNX Runtime Mobile 跑构图模型
-- TensorFlow Lite 跑美学评分
-- 陀螺仪做跨帧平滑，手抖时自动降低响应灵敏度
+| 层 | 用什么 |
+|---|---|
+| 取景 | CameraX（Preview + ImageAnalysis 320×240 抽帧 + ImageCapture） |
+| 场景识别 | Places365-ResNet18，LiteRT fp16，365 类，21.7 MB |
+| 光线判断 | 无模型，画面统计量（亮度、对比、上下/左右亮度差、高光占比）+ 系统时段 |
+| 姿势匹配 | 标签精确命中 4.0×概率 + 片段命中 2.0× + 分组兜底 1.5× + 时段 1.2 + 光线 1.0 |
+| 剪影渲染 | Compose Canvas 纯矢量绘制，零图片资源 |
+| UI | Jetpack Compose + Material 3 |
 
 ## 模型
 
 | 模型 | 来源 | 协议 | 体积 |
 |---|---|---|---|
-| Adacrop（构图裁剪框） | [LiveCompose/Adacrop-MNV3-Distilled](https://huggingface.co/LiveCompose/Adacrop-MNV3-Distilled) | MIT | 4.36 MB |
-| NIMA（美学评分） | [litert-community/NIMA-LiteRT](https://huggingface.co/litert-community/NIMA-LiteRT) | Apache-2.0 | 6.15 MB |
+| Places365-ResNet18 | [CSAILVision/places365](https://github.com/CSAILVision/places365) + [litert-community](https://huggingface.co/litert-community/Places365-ResNet18-LiteRT) | CC BY / Apache-2.0 | 21.7 MB |
+| NIMA 美学评分 | [litert-community/NIMA-LiteRT](https://huggingface.co/litert-community/NIMA-LiteRT) | Apache-2.0 | 6.2 MB |
 
-Adacrop 是 MobileNetV3-Small 蒸馏版，输出归一化 `(cx, cy, w, h)` 的裁剪框；
-NIMA 输出 1–10 的美学评分。桌面 CPU 实测分别约 4.2ms 和 29ms，真机请用 App 内的「性能实测」页自己测。
+两个模型都是 tflite，统一走 TFLite 运行时，没有引入 ONNX Runtime，
+因此 APK 比上一版小约 30 MB。
 
-模型转换与验证脚本见 [`tools/`](tools/README.md)。
+## 几个实现上的坑
+
+**Places365 要做 ImageNet 归一化，Adacrop 只做 /255。** 两个模型的预处理
+不一致，混用会让分类结果完全错乱。SceneClassifier 里写死了归一化参数。
+
+**YUV 帧必须按 `imageInfo.rotationDegrees` 旋转后再判断光线。** 不旋转的话
+竖屏时"天空在上"这个前提就是反的，逆光判断全部失效。
+
+**Places365 是国外数据集，国内场景会归到近似标签。** 例如古镇会被判成
+`courtyard`、油菜花田判成 `field/cultivated`。`SceneLabels.localHint` 给出
+针对性的解释，`PoseMatcher` 的分组兜底也保证任何场景都能出建议。
+
+**TFLite Interpreter 不是线程安全的。** 相机分析线程和性能测试页面可能并发
+调用，所有模型调用统一用 `modelLock` 串行化。
 
 ## 构建
-
-推送到 `main` 后 GitHub Actions 会自动构建，产物在 Actions 页面的 Artifacts 里（`aicamera-debug`）。
-
-本地构建：
 
 ```bash
 ./gradlew assembleDebug
 ```
 
-### 配置签名 release（可选）
+CI 在 `.github/workflows/build-apk.yml`，推 main 即触发，产物是 debug APK。
 
-默认只产出 debug APK。想出签名 release，在仓库 Settings → Secrets 里加四个变量：
-
-| Secret | 说明 |
-|---|---|
-| `KEYSTORE_BASE64` | `base64 -w0 your.keystore` 的输出 |
-| `KEYSTORE_PASSWORD` | keystore 密码 |
-| `KEY_ALIAS` | 密钥别名 |
-| `KEY_PASSWORD` | 密钥密码 |
-
-配好后工作流会自动多产出 `aicamera-release`。
-
-## 已知限制
-
-1. **无法接管系统相机取景器。** 第三方 App 只能用自己的相机界面，所以「取景引导」发生在本 App 内。
-2. **画质可能不如系统相机。** CameraX 走的是公开 Camera2 能力，拿不到厂商私有影像算法（夜景、HDR、人像虚化、色彩调校）。如果更在意画质，用「拍后分析」模式：用系统相机拍，回来让 AI 建议裁剪。
-3. 实时取景会同时开相机 + 两个模型推理，低端机会发热。App 会按 CPU 核心数和内存自动选抽帧档位（3 / 5 / 10 fps）。
-
-## 目录结构
+## 目录
 
 ```
 app/src/main/java/com/pelico/aicamera/
-├── MainActivity.kt
-├── CompositionViewModel.kt       # 节流、跨帧平滑、状态分发
+├── SceneViewModel.kt          场景/光线/姿势的状态中枢
 ├── engine/
-│   ├── CompositionEngine.kt      # Adacrop ONNX 推理
-│   ├── AestheticScorer.kt        # NIMA TFLite 推理
-│   ├── Guidance.kt               # 裁剪框 → 可执行的移动/变焦建议
-│   ├── MotionTracker.kt          # 陀螺仪，判断手是否端稳
-│   └── DeviceTier.kt             # 设备档位 → 抽帧间隔
+│   ├── SceneClassifier.kt     Places365 tflite 推理
+│   ├── SceneLabels.kt         365 类中文名 + 场景分组 + 本土化提示
+│   ├── LightingAnalyzer.kt    时段与光线判断（无模型）
+│   ├── PoseTemplate.kt        姿势模板数据模型 + 45 条模板
+│   ├── PoseMatcher.kt         场景 → 模板的匹配打分
+│   ├── AestheticScorer.kt     NIMA 美学评分
+│   ├── MotionTracker.kt       陀螺仪 + 水平仪
+│   └── DeviceTier.kt          设备档位
 ├── ui/
-│   ├── MainScreen.kt
-│   ├── CameraScreen.kt           # 取景引导 + 叠加层
-│   ├── AnalyzeScreen.kt          # 拍后分析
-│   └── BenchmarkScreen.kt        # 真机性能实测
-└── util/ImageSaver.kt
-
-tools/                            # 模型导出与验证脚本（Python）
-app/src/main/assets/              # onnx + tflite 模型
+│   ├── MainScreen.kt          权限 + 四个 Tab
+│   ├── CameraScreen.kt        取景与引导
+│   ├── PoseFigure.kt          剪影绘制 + 叠加层
+│   ├── PoseCard.kt            姿势卡片
+│   ├── PoseLibraryScreen.kt   姿势库浏览
+│   ├── AnalyzeScreen.kt       拍后分析
+│   └── BenchmarkScreen.kt     性能实测
+└── util/
+    ├── FrameConverter.kt      YUV → 已旋转 ARGB
+    └── ImageSaver.kt          保存到相册
 ```
 
-## 许可
+## 说明
 
-代码 MIT。模型遵循各自来源协议（Adacrop: MIT，NIMA: Apache-2.0），
-其中 NIMA 源自 idealo/image-quality-assessment，构图模型源自 LiveCompose。
+姿势模板的内容是手工整理的通用摄影经验，不是从任何受版权保护的图库抓取的；
+人形剪影是纯矢量绘制，不含第三方图片素材。

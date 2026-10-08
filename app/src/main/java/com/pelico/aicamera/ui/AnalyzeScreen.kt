@@ -1,120 +1,125 @@
 package com.pelico.aicamera.ui
 
-import android.widget.Toast
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size as ComposeSize
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.pelico.aicamera.CompositionViewModel
-import com.pelico.aicamera.util.ImageSaver
+import com.pelico.aicamera.SceneViewModel
 
+/**
+ * 拍后分析：给一张已拍的照片识别场景并打分，然后回答"下次在这儿该怎么拍"。
+ * 不做裁剪建议——真实构图建议交给取景页实时给。
+ */
 @Composable
-fun AnalyzeScreen(vm: CompositionViewModel) {
+fun AnalyzeScreen(vm: SceneViewModel) {
     val context = LocalContext.current
+    var photo by remember { mutableStateOf<Bitmap?>(null) }
+
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri ->
-        uri?.let { vm.analyzeStatic(it) }
+        if (uri == null) return@rememberLauncherForActivityResult
+        val bmp = runCatching {
+            context.contentResolver.openInputStream(uri)?.use {
+                BitmapFactory.decodeStream(it)
+            }
+        }.getOrNull()
+        if (bmp != null) {
+            photo = bmp
+            vm.analyzePhoto(bmp)
+        }
     }
-
-    val result by vm.analysis.collectAsState()
-    val ready by vm.ready.collectAsState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+            .padding(14.dp)
     ) {
-        Text("选一张已拍的照片，AI 会给出建议的构图区域与二次裁剪框。")
-
         Button(onClick = { launcher.launch("image/*") }) {
-            Text("从相册选择照片")
+            Text("从相册选一张照片")
         }
 
-        if (!ready) {
-            Text("模型加载中…")
+        photo?.let { bmp ->
+            Spacer(modifier = Modifier.height(12.dp))
+            Image(
+                bitmap = bmp.asImageBitmap(),
+                contentDescription = "选中的照片",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 260.dp),
+                contentScale = ContentScale.Fit
+            )
         }
 
-        result?.let { r ->
-            Box(modifier = Modifier.fillMaxWidth()) {
-                Image(
-                    bitmap = r.bitmap.asImageBitmap(),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxWidth(),
-                    contentScale = ContentScale.FillWidth
+        val scene = vm.currentScene
+        if (scene != null) {
+            Spacer(modifier = Modifier.height(14.dp))
+            Text(
+                text = "识别场景：${scene.zh}（${(scene.prob * 100).toInt()}%）",
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                text = "原始标签 ${scene.label} · ${scene.group.zh}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            vm.lighting?.let {
+                Text(
+                    text = it.describe(),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                Canvas(modifier = Modifier.matchParentSize()) {
-                    val w = size.width
-                    val h = size.height
-                    val box = r.box
-                    drawRect(
-                        color = Color(0xFF22C55E),
-                        topLeft = Offset(box.left * w, box.top * h),
-                        size = ComposeSize((box.right - box.left) * w, (box.bottom - box.top) * h),
-                        style = Stroke(width = 4f)
-                    )
-                }
+            }
+            com.pelico.aicamera.engine.SceneLabels.localHint(scene.label)?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+            if (vm.aesthetic > 0f) {
+                Text(
+                    text = "美学评分 %.2f / 10".format(vm.aesthetic),
+                    style = MaterialTheme.typography.titleSmall
+                )
             }
 
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Text("美学评分：%.2f / 10".format(r.score))
-                    Text("建议裁剪区域占原图 %.0f%%".format(r.box.w * r.box.h * 100f))
-                    Text("建议：${r.guidance.text}")
-                }
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = "下次在这儿可以这样拍：",
+                style = MaterialTheme.typography.titleMedium
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            vm.poses.forEach { scored ->
+                PoseCard(scored = scored, modifier = Modifier.padding(bottom = 10.dp))
             }
-
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Button(onClick = {
-                    val cropped = ImageSaver.crop(r.bitmap, r.box)
-                    if (cropped == null) {
-                        Toast.makeText(context, "裁剪失败", Toast.LENGTH_SHORT).show()
-                    } else {
-                        val uri = ImageSaver.save(context, cropped, "crop")
-                        val msg = if (uri == null) "保存失败" else "裁剪结果已保存到相册"
-                        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
-                        if (cropped !== r.bitmap) cropped.recycle()
-                    }
-                }) {
-                    Text("保存裁剪结果")
-                }
-                OutlinedButton(onClick = { vm.clearAnalysis() }) {
-                    Text("清除")
-                }
-            }
+        } else if (photo != null) {
+            Spacer(modifier = Modifier.height(14.dp))
+            Text("正在分析…", style = MaterialTheme.typography.bodyMedium)
         }
     }
 }
