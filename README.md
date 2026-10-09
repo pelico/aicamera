@@ -104,7 +104,8 @@ flowchart LR
         P --> R[PersonResult<br/>bbox / 景别 / 朝向 / 可见率]
     end
     subgraph L4[L4 决策]
-        S --> M[PoseMatcher<br/>选模板]
+        S --> U[SceneAffinity<br/>365 类 → 有序模板表]
+        U --> M[PoseMatcher<br/>选模板 + 场景适宜度]
         M --> N[PoseSpec<br/>目标角度 + 容差]
         R --> O[GuidanceArbiter<br/>优先级仲裁 → 一条]
         N --> O
@@ -128,9 +129,10 @@ flowchart LR
 | 场景识别 | Places365-ResNet18，TFLite fp16，365 类，21.7 MB |
 | 姿态检测 | MediaPipe Pose Landmarker **lite**，IMAGE 模式，33 点，5.5 MB |
 | 光线判断 | **无模型**：亮度、对比度、上下/左右亮度差、高光占比 + 系统时段 |
-| 姿势匹配 | 标签命中 4.0×概率 + 片段命中 2.0× + 分组兜底 1.5× + 时段 1.2× + 光线 1.0× + 有闭环规格 2.0× |
+| 姿势匹配 | 亲和表有序名次 6.0/4.5/3.0/1.5 × 概率（top-5 衰减叠加）+ 时段 0.6 + 光线 0.5 + 有闭环规格 0.8 |
+| 场景适宜度 | 365 类里 33 类判为不宜拍人像（浴室/机房/垃圾场…）、11 类需挑角度 |
 | 关节特征 | 9 个可测量量：双臂抬起 / 双肘 / 双膝夹角、躯干倾斜、两脚张开、脸的转向 |
-| 指令仲裁 | 优先级 没检到人 10 → 遮挡 20 → 水平 30 → 景别 40 → 站位 50/52 → 姿势 60 → 多人 75 → 就绪 100 |
+| 指令仲裁 | 优先级 场景不宜 5 → 没检到人 10 → 遮挡 20 → 水平 30 → 景别 40 → 站位 50/52 → 姿势 60 → 多人 75 → 需挑角度 90 → 就绪 100 |
 | 剪影渲染 | Compose Canvas 纯矢量绘制，**零图片资源** |
 | 水平仪 | 陀螺仪/旋转向量的 roll 角 |
 | UI | Jetpack Compose + Material 3 |
@@ -152,6 +154,37 @@ flowchart LR
 手机端走 XNNPACK 多线程应显著更快；姿态检测的实际耗时请用 App 内「性能实测」页在真机上看。
 
 ---
+
+## 推荐是怎么算出来的（以及中间为什么重写过一次）
+
+v3 第一版上线后反馈是「场景识别能工作，但拍摄建议不理想」。把打分逻辑在
+`tools/diag_match.py` 里用 Python 复刻一遍、跑遍 365 个场景标签，结果是：
+
+| 指标 | v3 首版 | 现在 |
+|---|---|---|
+| 首条推荐存在**同分并列**的场景 | 271 / 365（74%） | **0** |
+| 能被模板 tag 命中的标签 | 133 / 365（36%） | — |
+| 首条推荐等于亲和表首选 | — | **365 / 365** |
+
+同分并列意味着推荐不由场景决定，而是 Kotlin 稳定排序下「模板在 `PoseLibrary.ALL`
+里排第几条」。加上 `SHOP` 一个分组塞了 112 个标签（办公室 / 卧室 / 商场 / 电梯 / 展馆）
+却只有 4 条咖啡馆模板，于是**在办公室举起手机，它给你推「书架间回眸」**。
+更糟的是时段 +1.2、光线 +1.0 的权重大于分组命中的 1.5×概率 ≈ 0.6，
+「现在几点」比「你在哪」更能决定推荐什么。
+
+改法是三件事一起做：
+
+1. **补内容**，模板 44 → 57 条，新增「室内 · 日常」一大组（沙发 / 窗边 / 桌前 /
+   床边 / 展墙 / 中庭 / 楼梯 / 餐桌 / 大堂 / 走廊 / 货架过道），外加玻璃幕墙与天台夜景。
+2. **显式亲和表** `assets/scene_affinity.json`：365 个标签各有一份排好序的模板 id 列表，
+   由 `tools/gen_affinity.py` 生成（手工覆盖 99 / 关键词规则 99 / tag 命中 86 / 分组兜底 81）。
+   同分并列从根上消失。**改完 `PoseTemplate.kt` 要重新生成一次**。
+3. **重写打分**：主分来自亲和表名次，时段/光线降到 0.6 / 0.5 只做微调，
+   并把人数与当前景别纳入——已经怼脸特写了还推全身模板没意义。
+
+另外加了 `SceneUsability`：**33 个场景标签判为不宜拍人像**（浴室、更衣室、机房、
+垃圾场、电梯井…），这些地方不再硬凑姿势，直接说"换个地方"。
+在洗手间里给拍照建议比不给更糟。
 
 ## 实现中踩过的坑
 
@@ -206,9 +239,10 @@ app/src/main/java/com/pelico/aicamera/
 │   ├── LightingAnalyzer.kt    时段与光线判断（无模型）
 │   ├── PoseEngine.kt          L1 姿态层：MediaPipe Pose → PersonResult
 │   ├── PoseAngles.kt          33 点 → 9 个关节特征 + 人话文案
-│   ├── PoseTemplate.kt        模板数据模型 + 45 条模板
+│   ├── PoseTemplate.kt        模板数据模型 + 57 条模板
 │   ├── PoseSpec.kt            pose_specs.json 解析 + 角度差匹配
-│   ├── PoseMatcher.kt         场景 → 模板的匹配打分
+│   ├── SceneAffinity.kt       365 类 → 有序模板表 + 场景适宜度
+│   ├── PoseMatcher.kt         场景 → 模板的匹配打分（亲和表优先 + 画面上下文）
 │   ├── GuidanceArbiter.kt     L4 仲裁：多偏差 → 一条指令
 │   ├── AestheticScorer.kt     NIMA 美学评分
 │   ├── MotionTracker.kt       陀螺仪 + 水平仪
@@ -233,17 +267,20 @@ app/src/main/assets/
 ├── nima_aesthetic_fp16.tflite 美学评分
 ├── pose_landmarker_lite.task  姿态检测
 ├── categories_places365.txt   365 类标签
+├── scene_affinity.json        365 类 → 有序模板 + 不宜拍的场景
 └── pose_specs.json            10 条模板的角度目标（verified=false）
 
 tools/                         离线工具（不参与 APK 构建）
 ├── fetch_models.py            补下缺失的模型文件
+├── gen_affinity.py            重新生成 scene_affinity.json
+├── diag_match.py              推荐链路诊断（同分并列 / 覆盖率）
 ├── eval_scene.py              场景粗类评测（见 docs/EVALUATION.md）
 ├── export_onnx.py             [v1] Adacrop → 单文件 ONNX 导出
 ├── verify_*.py               模型验证脚本
 └── models/common.py           [v1] MobileNetPolicy 结构定义
 ```
 
-工程规模：Kotlin 约 3,600 行，其中姿势模板库独占 807 行 ——
+工程规模：Kotlin 约 3,800 行，其中姿势模板库独占约 1,000 行 ——
 **这个项目的成本主要在内容，不在代码。**
 
 ---
