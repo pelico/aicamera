@@ -20,7 +20,6 @@ import com.pelico.aicamera.util.contentRect
 import com.pelico.aicamera.util.project
 import kotlin.math.abs
 import kotlin.math.cos
-import kotlin.math.maxOf
 import kotlin.math.sin
 
 /**

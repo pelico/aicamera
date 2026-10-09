@@ -190,6 +190,16 @@ fun CameraScreen(vm: SceneViewModel) {
             modifier = Modifier.fillMaxSize()
         )
 
+        // 文案在组合之外先算好：把 if/else 塞进 Row 的 content lambda 里，
+        // Kotlin 会把 lambda 的返回类型推歪，报出莫名其妙的 'K' 类型不匹配
+        val titleText = if (scene == null) {
+            "正在识别场景…"
+        } else {
+            "${scene.coarse.zh}  ${(scene.coarseProb * 100).toInt()}%"
+        }
+        val subText = scene?.top?.firstOrNull()?.zh ?: ""
+        val lightText = vm.lighting?.describe() ?: ""
+
         Surface(
             shape = MaterialTheme.shapes.medium,
             color = Color.Black.copy(alpha = 0.55f),
@@ -202,33 +212,28 @@ fun CameraScreen(vm: SceneViewModel) {
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                if (scene == null) {
+                Column {
                     Text(
-                        text = "正在识别场景…",
-                        style = MaterialTheme.typography.bodyMedium,
+                        text = titleText,
+                        style = if (scene == null) MaterialTheme.typography.bodyMedium
+                        else MaterialTheme.typography.titleSmall,
                         color = Color.White
                     )
-                } else {
-                    Column {
+                    if (subText.isNotEmpty()) {
                         Text(
-                            text = "${scene.coarse.zh}  ${(scene.coarseProb * 100).toInt()}%",
-                            style = MaterialTheme.typography.titleSmall,
-                            color = Color.White
-                        )
-                        Text(
-                            text = scene.top.firstOrNull()?.zh ?: "",
+                            text = subText,
                             style = MaterialTheme.typography.bodySmall,
                             color = Color.White.copy(alpha = 0.7f)
                         )
                     }
+                }
+                if (lightText.isNotEmpty()) {
                     Spacer(modifier = Modifier.width(10.dp))
-                    vm.lighting?.let {
-                        Text(
-                            text = it.describe(),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color.White.copy(alpha = 0.85f)
-                        )
-                    }
+                    Text(
+                        text = lightText,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.White.copy(alpha = 0.85f)
+                    )
                 }
             }
         }

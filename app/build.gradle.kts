@@ -45,6 +45,9 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        // MediaPipe 的 visibility() 返回 java.util.Optional，那是 API 26 才有的类。
+        // minSdk 24 要用到它就必须脱糖，否则在 Android 7 上会 NoClassDefFoundError。
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
@@ -94,6 +97,7 @@ dependencies {
 
     // L1 姿态层。锁死版本号：用 latest.release 会在某次自动升级里引入不兼容
     implementation("com.google.mediapipe:tasks-vision:0.10.14")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 }

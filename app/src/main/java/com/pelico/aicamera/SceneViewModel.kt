@@ -16,6 +16,10 @@ import com.pelico.aicamera.contract.PersonResult
 import com.pelico.aicamera.contract.SceneAttrs
 import com.pelico.aicamera.contract.SceneResult
 import com.pelico.aicamera.engine.AestheticScorer
+import com.pelico.aicamera.engine.DeviceTierDetector
+import com.pelico.aicamera.engine.GuidanceArbiter
+import com.pelico.aicamera.engine.Lighting
+import com.pelico.aicamera.engine.LightingAnalyzer
 import com.pelico.aicamera.engine.MotionTracker
 import com.pelico.aicamera.engine.PoseAngles
 import com.pelico.aicamera.engine.PoseEngine
@@ -55,7 +59,7 @@ class SceneViewModel(app: Application) : AndroidViewModel(app) {
 
     private val busy = AtomicBoolean(false)
 
-    /** 请求把 neutrino 设备档位真正接进管线：由它决定两条节奏与抽帧分辨率 */
+    /** 设备档位真正接进管线：由它决定两条节奏与抽帧分辨率 */
     val policy: RuntimePolicy = DeviceTierDetector.policy()
 
     val motion: MotionTracker = MotionTracker(app)

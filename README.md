@@ -14,17 +14,20 @@
 
 于是换了个思路，也是最关键的转折：
 
-| | v1 构图引导（已弃） | v2 场景驱动的姿势推荐（当前） |
-|---|---|---|
-| 做什么 | 回归一个构图框让用户去追 | 识别场景 → 给出站位 + 姿势方案 |
-| 是否判断人 | 不做姿态估计，但要引导用户移动 | **明确不做**，只判断"景" |
-| 输出 | 会抖动的框 + 方向箭头 | 确定性的几何 + 文字要点 |
-| 稳定性 | 回归任务，帧间易跳 | 分类任务，输出稳定 |
-| 用户能否照做 | 难，方向感模糊 | 能，"侧身 45°、相机压到腰高" |
+| | v1 构图引导（已弃） | v2 场景推荐（已弃） | **v3 闭环引导（当前）** |
+|---|---|---|---|
+| 做什么 | 回归一个构图框让用户去追 | 识别场景 → 给出站位 + 姿势方案 | 识别场景 + 检出人 → **一次只给一条指令** |
+| 是否判断人 | 不做姿态估计，但要引导用户移动 | **明确不做**，只判断"景" | 做，MediaPipe Pose 33 点 |
+| 输出 | 会抖动的框 + 方向箭头 | 三条姿势卡片并列 | **一条指令 + 目标框/真实框重合度** |
+| 稳定性 | 回归任务，帧间易跳 | 分类任务，输出稳定 | 分类 + 确定性几何，均做了去抖 |
+| 用户能否照做 | 难，方向感模糊 | 能，但一次给三条等于没给 | 能，"人往左挪一点""左肘再弯一点" |
 
 **核心判断**：与其让 AI 猜一个你看不懂的框，不如让它告诉你一件能照做的事。
-场景识别是分类任务，比回归稳得多；而且场景变化很慢，**1.5 秒识别一次就够**，
-高帧率反而不必要 —— 性能压力一下子消失了。
+场景识别是分类任务，比回归稳得多；而且场景变化慢，**1 秒多识别一次就够**，
+高帧率反而不必要 —— 省下来的算力刚好够跑姿态检测。
+
+v2 的失败不在识别，而在输出：同样一个场景，人站哪、什么景别都给一样的答案，
+而且三条卡片并列的结果是一条都看不完。v3 因此把人接回闭环，并把输出压到一条。
 
 v1 的代码已从 `app/` 移除，但 Adacrop 模型的导出与验证脚本保留在 `tools/`，
 想捡回来可以直接跑（详见文末「如果你想要回 v1」）。
@@ -34,7 +37,9 @@ v1 的代码已从 `app/` 移除，但 Adacrop 模型的导出与验证脚本保
 ## 快速开始
 
 **直接用**：仓库 Actions 每次推 main 会自动出 debug APK，在 Actions 页面下载 `aicamera-debug` 产物即可。
-APK 约 **44 MB**，minSdk 24（Android 7.0+），两个 ABI（arm64-v8a / armeabi-v7a）。
+minSdk 24（Android 7.0+），两个 ABI（arm64-v8a / armeabi-v7a）。
+v2 的 APK 是 44 MB；v3 加了 MediaPipe 姿态层（模型 5.5 MB + 两个 ABI 的 native 库），
+会明显变大，**实际体积以 Actions 产物为准**。在意体积的话可以把 `abiFilters` 收成只留 `arm64-v8a`。
 
 **自己构建**：需要 JDK 17（Gradle 8.7 / AGP 8.5.2 / Kotlin 2.0.21）。
 
@@ -44,10 +49,10 @@ cd aicamera
 ./gradlew assembleDebug        # 产物 app/build/outputs/apk/debug/app-debug.apk
 ```
 
-模型文件已随仓库提交（27.9 MB）。若被 Git LFS 或网络策略剥离，可用脚本补下：
+模型文件已随仓库提交（34 MB）。若被 Git LFS 或网络策略剥离，可用脚本补下：
 
 ```bash
-python tools/fetch_models.py    # 下载 places_fp16.tflite / nima_aesthetic_fp16.tflite / 标签文件
+python tools/fetch_models.py    # 4 个模型/资源：Places365、NIMA、标签、pose_landmarker_lite.task
 ```
 
 CI 配置在 `.github/workflows/build-apk.yml`，内含模型缺失时的兜底下载步骤。
@@ -57,15 +62,18 @@ CI 配置在 `.github/workflows/build-apk.yml`，内含模型缺失时的兜底�
 
 ## 四个页面
 
-**取景推荐** — CameraX 实时预览，每 1.5 秒识别一次场景。画面叠加三分参考线、站位虚线框、
-矢量人形剪影和水平仪；下方卡片给出当前场景最匹配的姿势（朝向、机位、分步动作、要点），
-可左右切换 Top 3，对齐后按快门。
+**取景推荐** — CameraX 实时预览。场景低频（约 1 fps）识别，姿态高频（5~10 fps）检测。
+画面上叠三分线、**虚线目标站位框**（模板给的）和**实线真实人物框 + 骨架**（MediaPipe 检到的），
+两框重合就是站位对了；底部一条横幅**一次只显示一条指令**，按优先级挑最该改的那一项。
 
 **姿势库** — 45 条模板按 12 个场景大类浏览，可手动指定一条，切回取景页照着摆。
+其中 10 条带角度规格（`pose_specs.json`），只有它们能进"摆到位了"的闭环。
 
-**拍后分析** — 从相册选一张已拍照片，识别场景 + 美学评分，并回答"下次在这儿该怎么拍"。
+**拍后分析** — 从相册选一张已拍照片，识别场景 + 美学评分 + 人物景别/朝向，
+并回答"如果重拍这张，最该改的是哪一条"。
 
-**性能实测** — 在当前机器上真跑两个模型若干次，给出实际单帧延迟与设备档位。
+**性能实测** — 在当前机器上真跑三个模型，给出实际单帧延迟、设备档位与调度节奏；
+另有「复制当前角度」按钮，用于给 `pose_specs.json` 采样校准。
 桌面 CPU 的数据只能作数量级参考，**真机请用这一页**。
 
 ---
@@ -74,46 +82,64 @@ CI 配置在 `.github/workflows/build-apk.yml`，内含模型缺失时的兜底�
 
 ```mermaid
 flowchart LR
-    A[CameraX ImageAnalysis<br/>320×240 抽帧] --> B[FrameConverter<br/>YUV → 已旋转 ARGB]
-    B --> C[SceneClassifier<br/>Places365 tflite 365 类]
-    B --> D[LightingAnalyzer<br/>画面统计量 + 系统时段]
-    C --> E[PoseMatcher<br/>标签/分组/时段/光线 加权打分]
-    D --> E
-    E --> F[45 条 PoseTemplate]
-    F --> G[SceneViewModel]
-    G --> H[Compose UI<br/>叠加剪影 + 站位框 + 卡片]
+    subgraph L0[L0 感知 · 分两条节奏]
+        A[CameraX ImageAnalysis<br/>按档位 640×480 / 480×360 / 320×240] --> B[FrameConverter<br/>YUV → 已旋转 ARGB]
+        B -->|低频 ~1fps| C[SceneClassifier<br/>Places365 365 类]
+        B -->|低频| D[LightingAnalyzer<br/>统计量 + 系统时段]
+        B -->|高频 5~10fps| P[PoseEngine<br/>MediaPipe Pose 33 点]
+    end
+    subgraph L1[L1 契约]
+        C --> S[SceneResult<br/>粗类 + 光线属性]
+        D --> S
+        P --> R[PersonResult<br/>bbox / 景别 / 朝向 / 可见率]
+    end
+    subgraph L4[L4 决策]
+        S --> M[PoseMatcher<br/>选模板]
+        M --> N[PoseSpec<br/>目标角度 + 容差]
+        R --> O[GuidanceArbiter<br/>优先级仲裁 → 一条]
+        N --> O
+        S --> O
+        T[MotionTracker 倾角] --> O
+        O --> V[SceneViewModel · 去抖 350ms]
+        V --> W[Compose UI<br/>指令横幅 + 目标框/真实框]
+    end
     B --> I[AestheticScorer<br/>NIMA 美学评分]
-    I --> G
-    J[MotionTracker<br/>陀螺仪] --> G
+    I --> V
 ```
 
-推理链路很短：**每 1.5 秒一次前向推理**，其余时间只做贴图绘制，所以基本不发热。
+两条节奏是这版性能上的关键：场景慢（省电），姿态快（跟手），**共用同一帧、只做一次 YUV 转换**。
+入门机（核少 / 内存小）直接关掉姿态层，保留场景 + 参考线 + 站位框这些零成本的部分。
 
 ## 技术栈
 
 | 层 | 用什么 |
 |---|---|
 | 取景 | CameraX 1.3.4（Preview + ImageAnalysis + ImageCapture） |
-| 场景识别 | Places365-ResNet18，LiteRT fp16，365 类，21.7 MB |
+| 场景识别 | Places365-ResNet18，TFLite fp16，365 类，21.7 MB |
+| 姿态检测 | MediaPipe Pose Landmarker **lite**，IMAGE 模式，33 点，5.5 MB |
 | 光线判断 | **无模型**：亮度、对比度、上下/左右亮度差、高光占比 + 系统时段 |
-| 姿势匹配 | 标签精确命中 4.0×概率 + 片段命中 2.0× + 分组兜底 1.5× + 时段 1.2× + 光线 1.0× |
+| 姿势匹配 | 标签命中 4.0×概率 + 片段命中 2.0× + 分组兜底 1.5× + 时段 1.2× + 光线 1.0× + 有闭环规格 2.0× |
+| 关节特征 | 9 个可测量量：双臂抬起 / 双肘 / 双膝夹角、躯干倾斜、两脚张开、脸的转向 |
+| 指令仲裁 | 优先级 没检到人 10 → 遮挡 20 → 水平 30 → 景别 40 → 站位 50/52 → 姿势 60 → 多人 75 → 就绪 100 |
 | 剪影渲染 | Compose Canvas 纯矢量绘制，**零图片资源** |
 | 水平仪 | 陀螺仪/旋转向量的 roll 角 |
 | UI | Jetpack Compose + Material 3 |
-| 设备自适应 | 按 CPU 核心数 + 内存分 3 档（10 / 5 / 3 fps） |
+| 设备自适应 | 按 CPU 核数 + 内存分 3 档，档位决定：场景间隔 / 姿态间隔 / 分析帧分辨率 / 是否开姿态 |
 
 ## 模型资产
 
 | 模型 | 来源 | 协议 | 体积 |
 |---|---|---|---|
-| Places365-ResNet18 | [CSAILVision/places365](https://github.com/CSAILVision/places365) via [litert-community](https://huggingface.co/litert-community/Places365-ResNet18-LiteRT) | CC BY | 21.7 MB |
+| Places365-ResNet18 | [CSAILVision/places365](https://github.com/CSAILVision/places365) via [litert-community](https://huggingface.co/litert-community/Places365-ResNet18-LiteRT) | MIT | 21.7 MB |
 | NIMA 美学评分 | [litert-community/NIMA-LiteRT](https://huggingface.co/litert-community/NIMA-LiteRT) | Apache-2.0 | 6.2 MB |
+| Pose Landmarker lite | [Google MediaPipe](https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task) | Apache-2.0 | 5.5 MB |
 
-两个模型都是 tflite，统一走 TFLite 运行时 —— 上一版的 ONNX Runtime 已经去掉，
-仅此一项就让 APK 从 59.5 MB 降到 44.2 MB。
+场景与美学模型都是 tflite，统一走 TFLite 运行时 —— v1 的 ONNX Runtime 已经去掉，
+仅此一项就让 APK 从 59.5 MB 降到 44.2 MB。姿态层用 `.task`（MediaPipe 自有的 bundle 格式），
+不受这个改动影响，但**会带入两个 ABI 的 native 库**。
 
 **参考性能**（桌面 CPU，仅供估计数量级）：Places365 86.8 ms/帧、NIMA 29.0 ms/帧。
-手机端走 XNNPACK 多线程应显著更快，且场景识别本来就不需要高频。
+手机端走 XNNPACK 多线程应显著更快；姿态检测的实际耗时请用 App 内「性能实测」页在真机上看。
 
 ---
 
@@ -139,43 +165,75 @@ flowchart LR
 **CameraX 的 `setSurfaceProvider` 是 Java setter，无 getter 配对。**
 Kotlin 里必须写 `it.setSurfaceProvider(...)`，属性赋值语法会报 Unresolved reference。
 
+**MediaPipe 的帧只能旋转一次。** `FrameConverter` 已经把 YUV 转到屏幕正立方向，
+PoseEngine 用 IMAGE 模式就**不能再传 rotationDegrees**，否则转两次、左右全反。
+
+**`.task` 必须加进 `noCompress`。** 压缩过的模型从 assets 加载会直接失败，
+而且失败信息不一定指向真正的原因。`.tflite` 同理。
+
+**`visibility()` 返回的是 `Optional<Float>`，不是 `float`。** 而且 minSdk 24 上
+`java.util.Optional` 是 API 26 才有的类 —— 要用到它必须开 `coreLibraryDesugaring`，
+否则 Android 7 上直接 `NoClassDefFoundError`。取不到可见度时退回 1f，不让"遮挡"误报。
+
+**叠加层必须画在"预览可见矩形"里，不是全屏。** ImageAnalysis 是 4:3，PreviewView 是全屏
+FIT_CENTER，两者坐标系不同；高瘦屏上直接用全屏尺寸画，目标框会整体偏出画面。
+`util/ViewportMapper` 就是干这个的。
+
+**45 条模板 ≠ 45 条能进闭环。** 只有带 `pose_specs.json` 角度目标的 10 条能判"摆到位了"，
+其余只给站位与朝向参考 —— 硬凑数值等于编数据。
+
 ---
 
 ## 目录结构
 
 ```
 app/src/main/java/com/pelico/aicamera/
-├── SceneViewModel.kt          场景 / 光线 / 姿势的状态中枢
+├── contract/Perception.kt     L0 契约：SceneResult / PersonResult / Guidance
+├── SceneViewModel.kt          状态中枢 + 双节奏调度 + 指令去抖
 ├── engine/
 │   ├── SceneClassifier.kt     Places365 tflite 推理
 │   ├── SceneLabels.kt         365 类中文名 + 场景分组 + 本土化提示
 │   ├── LightingAnalyzer.kt    时段与光线判断（无模型）
-│   ├── PoseTemplate.kt        姿势模板数据模型 + 45 条模板
+│   ├── PoseEngine.kt          L1 姿态层：MediaPipe Pose → PersonResult
+│   ├── PoseAngles.kt          33 点 → 9 个关节特征 + 人话文案
+│   ├── PoseTemplate.kt        模板数据模型 + 45 条模板
+│   ├── PoseSpec.kt            pose_specs.json 解析 + 角度差匹配
 │   ├── PoseMatcher.kt         场景 → 模板的匹配打分
+│   ├── GuidanceArbiter.kt     L4 仲裁：多偏差 → 一条指令
 │   ├── AestheticScorer.kt     NIMA 美学评分
 │   ├── MotionTracker.kt       陀螺仪 + 水平仪
-│   └── DeviceTier.kt          设备档位探测
+│   └── DeviceTier.kt          设备档位 → RuntimePolicy（真正接线）
 ├── ui/
 │   ├── MainScreen.kt          权限 + 四个 Tab
 │   ├── CameraScreen.kt        取景与引导
-│   ├── PoseFigure.kt          剪影绘制 + 叠加层
+│   ├── PoseFigure.kt          剪影 + 叠加层（目标框/真实框/骨架）
+│   ├── GuidanceBanner.kt      单指令横幅
 │   ├── PoseCard.kt            姿势卡片
 │   ├── PoseLibraryScreen.kt   姿势库浏览
 │   ├── AnalyzeScreen.kt       拍后分析
-│   ├── BenchmarkScreen.kt     性能实测
+│   ├── BenchmarkScreen.kt     性能实测 + 角度采样
 │   └── theme/Theme.kt
 └── util/
     ├── FrameConverter.kt      YUV → 已旋转 ARGB
+    ├── ViewportMapper.kt      分析帧 → 预览可见矩形
     └── ImageSaver.kt          保存到相册
 
-tools/                         离线模型工具（不参与 APK 构建）
+app/src/main/assets/
+├── places_fp16.tflite         场景分类
+├── nima_aesthetic_fp16.tflite 美学评分
+├── pose_landmarker_lite.task  姿态检测
+├── categories_places365.txt   365 类标签
+└── pose_specs.json            10 条模板的角度目标（verified=false）
+
+tools/                         离线工具（不参与 APK 构建）
 ├── fetch_models.py            补下缺失的模型文件
+├── eval_scene.py              场景粗类评测（见 docs/EVALUATION.md）
 ├── export_onnx.py             [v1] Adacrop → 单文件 ONNX 导出
 ├── verify_*.py               模型验证脚本
 └── models/common.py           [v1] MobileNetPolicy 结构定义
 ```
 
-工程规模：Kotlin 约 3,085 行，其中姿势模板库独占 807 行 ——
+工程规模：Kotlin 约 3,600 行，其中姿势模板库独占 807 行 ——
 **这个项目的成本主要在内容，不在代码。**
 
 ---
@@ -192,13 +250,27 @@ tools/                         离线模型工具（不参与 APK 构建）
 **剪影的可读性还没经过真机验证。** 剪影是参数化矢量绘制，缩放不失真，
 但小屏幕上"朝向"指示是否一眼看懂，需要实际使用反馈。
 
+**`pose_specs.json` 里的角度全部 `verified = false`。** 那 10 条的目标角度是
+按几何关系推的初值，不是从真人采样统计出来的。App 内置「复制当前角度」入口：
+摆好 → 复制 → 贴回 JSON → 把 `verified` 翻成 true。在翻之前，
+这些数值只表示"可以试"，不表示"已经准"。
+
+**背面朝向测不出来，所以不判。** MediaPipe Pose 输出的是朝 -Z 的骨架，
+正面和背面在 2D 投影上长得一样。`PersonResult.facing` 只可能是 FRONT / SIDE_45 / SIDE_90，
+背身类的模板（`BACK` / `LOOK_BACK`）在加载 spec 时就被过滤掉，不进角度闭环。
+不做假判断比给一个错判断有用。
+
+**遮挡判断依赖关键点的 visibility。** 拿不到可见度时退回"有没有出画"，
+此时被物体挡住（人站在柱子后面）是测不出来的。
+
 ## 后续可以做的
 
-- [ ] 只打 arm64-v8a，APK 再瘦约 5 MB
+- [ ] **把 10 条 spec 采样校准到 verified=true**（App 内已有采样入口，缺的是人去摆）
+- [ ] 评测集落地：`tools/eval_scene.py` 已就绪，`docs/EVALUATION.md` 写了怎么凑 100~150 张
+- [ ] 只打 arm64-v8a，APK 明显变瘦（代价是不支持 32 位老机型）
 - [ ] 收集国内特色场景样本，微调一个小分类器替换 Places365 的近似结果
 - [ ] 加推荐去重：同一场景连续出现时轮换不同姿势，不要总推同一条
-- [ ] 姿势模板按用户实际反馈迭代（目前是人工整理的通用摄影经验）
-- [ ] 对齐识别到一定程度时自动触发快门
+- [ ] 对齐到一定程度时自动触发快门（指令为 READY 且稳定 1 秒）
 
 ## 如果你想要回 v1
 

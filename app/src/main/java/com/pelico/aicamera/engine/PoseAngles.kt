@@ -90,7 +90,8 @@ object PoseAngles {
         // 上身倾斜：躯干方向与「垂直向下」的夹角，正 = 上身向画面右侧倾
         val torsoDx = shoulderMid.first - hipMid.first
         val torsoDy = shoulderMid.second - hipMid.second
-        out[AngleKey.TORSO_LEAN] = Math.toDegrees(atan2(torsoDx, torsoDy)).toFloat()
+        // atan2(Float, Float) 返回 Float，而 Math.toDegrees 只收 Double —— 必须显式转换
+        out[AngleKey.TORSO_LEAN] = Math.toDegrees(atan2(torsoDx, torsoDy).toDouble()).toFloat()
 
         out[AngleKey.LEG_SPREAD] = ratio(abs(p[Lm.ANKLE_L].x - p[Lm.ANKLE_R].x), hipW)
         out[AngleKey.HEAD_TURN] = ratio(p[Lm.NOSE].x - shoulderMid.first, shoulderW) * 2f

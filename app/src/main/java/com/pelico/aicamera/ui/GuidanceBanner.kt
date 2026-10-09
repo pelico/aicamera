@@ -83,8 +83,9 @@ fun GuidanceBanner(
                     modifier = Modifier.padding(top = 4.dp)
                 )
             }
+            // material3 1.3（BOM 2024.09）的 progress 还是 Float，不是 lambda
             LinearProgressIndicator(
-                progress = { g.progress.coerceIn(0f, 1f) },
+                progress = g.progress.coerceIn(0f, 1f),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 8.dp)

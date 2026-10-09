@@ -18,6 +18,10 @@ import kotlin.math.abs
  * 用真机把每个姿势各摆几次、把 JSON 贴回 `pose_specs.json`，才能把 verified 翻成 true。
  * 在验证之前，这 10 条只作为「可以试」而不是「已经准」对外。
  */
+/** 容差与打分尺度放在文件顶层：Kotlin 里 object 的成员不能在本 object 之外直接按名字引用 */
+private const val DEFAULT_TOL = 18f
+private const val SCORE_SCALE = 40f
+
 data class PoseSpec(
     val templateId: String,
     val targetCx: Float,
@@ -146,7 +150,8 @@ object PoseSpecStore {
             out += PoseSpec(
                 templateId = id,
                 targetCx = o.optDouble("target_cx", 0.5).toFloat().coerceIn(0.05f, 0.95f),
-                targetFootY = o.optDouble("target_foot_y", 0.85f).toFloat().coerceIn(0.2f, 1f),
+                // optDouble 的默认值是 double，写 0.85f 会报类型不匹配
+                targetFootY = o.optDouble("target_foot_y", 0.85).toFloat().coerceIn(0.2f, 1f),
                 bboxHRatio = ratio,
                 // 以 ratio 为准，避免 JSON 里两者写不一致
                 shotSize = ShotSize.of(ratio),
@@ -174,6 +179,4 @@ object PoseSpecStore {
     }
 
     const val FILE = "pose_specs.json"
-    const val DEFAULT_TOL = 18f
-    private const val SCORE_SCALE = 40f
 }

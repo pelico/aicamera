@@ -68,15 +68,21 @@ class PoseEngine(context: Context) {
             .filter { it.size >= 33 }
             .maxByOrNull { span(it) } ?: return null
 
-        val points = picked.map { LmPoint(it.x(), it.y(), 1f) }
+        // visibility() 返回的是 Optional<Float>（不是 float），且某些构建里始终为空。
+        // 取不到就退回 1f，让「有没有出画」继续兜底，不会因为取不到可见度就判定人被挡住。
+        val points = picked.map { lm ->
+            val vis = lm.visibility()
+            LmPoint(lm.x(), lm.y(), if (vis.isPresent) vis.get() else 1f)
+        }
         val box = bounds(points)
 
-        var outOfFrame = 0
+        var visibleCount = 0
         for (idx in Lm.CORE) {
             val pt = points[idx]
-            if (pt.x < 0f || pt.x > 1f || pt.y < 0f || pt.y > 1f) outOfFrame++
+            val inFrame = pt.x >= 0f && pt.x <= 1f && pt.y >= 0f && pt.y <= 1f
+            if (inFrame && pt.visibility >= VIS_MIN) visibleCount++
         }
-        val visibleRatio = 1f - outOfFrame.toFloat() / Lm.CORE.size
+        val visibleRatio = visibleCount.toFloat() / Lm.CORE.size
 
         val footY = max(
             max(points[Lm.ANKLE_L].y, points[Lm.ANKLE_R].y),
@@ -179,5 +185,7 @@ class PoseEngine(context: Context) {
         const val MODEL_FILE = "pose_landmarker_lite.task"
         private const val MAX_POSES = 2
         private const val CONF = 0.5f
+        /** 低于这个可见度就当作被挡住 */
+        private const val VIS_MIN = 0.5f
     }
 }
