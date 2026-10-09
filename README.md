@@ -38,8 +38,18 @@ v1 的代码已从 `app/` 移除，但 Adacrop 模型的导出与验证脚本保
 
 **直接用**：仓库 Actions 每次推 main 会自动出 debug APK，在 Actions 页面下载 `aicamera-debug` 产物即可。
 minSdk 24（Android 7.0+），两个 ABI（arm64-v8a / armeabi-v7a）。
-v2 的 APK 是 44 MB；v3 加了 MediaPipe 姿态层（模型 5.5 MB + 两个 ABI 的 native 库），
-会明显变大，**实际体积以 Actions 产物为准**。在意体积的话可以把 `abiFilters` 收成只留 `arm64-v8a`。
+
+**当前 APK 78.2 MB**（v2 是 44.2 MB）。构成实测：
+
+| 部分 | 体积 | 说明 |
+|---|---|---|
+| 模型与资源 | 35.0 MB | Places365 21.7 + NIMA 6.2 + Pose 5.5 + 标签 + 规格 |
+| MediaPipe native | 22.5 MB | arm64 14.0 + armv7 8.5（`libmediapipe_tasks_vision_jni.so`） |
+| TFLite native | 5.6 MB | arm64 3.4 + armv7 2.2 |
+| 代码与资源 | 其余 | — |
+
+想瘦身最直接的一步是把 `abiFilters` 收成只留 `arm64-v8a`，**立省约 11 MB**，
+代价是不再支持 32 位老机型。
 
 **自己构建**：需要 JDK 17（Gradle 8.7 / AGP 8.5.2 / Kotlin 2.0.21）。
 
