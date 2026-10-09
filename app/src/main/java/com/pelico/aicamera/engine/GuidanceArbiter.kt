@@ -13,8 +13,8 @@ import kotlin.math.abs
  * 用户一眼看完等于一条都没看。这里强制一次只出一条，按优先级挑最该改的。
  *
  * 优先级顺序（数字越小越先说）：
- *  10 没检到人 → 20 人被挡/没进全 → 30 水平 → 40 景别 → 50 站位 → 60 姿势角度
- *  → 75 多人提示 → 95 降级说明 → 100 可以拍了
+ *  5 场景不宜 → 10 没检到人 → 20 人被挡/没进全 → 30 水平 → 40 景别 → 50 站位
+ *  → 60 姿势角度 → 75 多人提示 → 95 降级说明 → 100 可以拍了
  *
  * 刻意不给的建议：机位高度、 expresses 表情、眼神——这些都测不出来，给就是编的。
  */
@@ -26,7 +26,9 @@ object GuidanceArbiter {
         val template: PoseTemplate?,
         val spec: PoseSpec?,
         val tiltDeg: Float,
-        val hasTarget: Boolean
+        val hasTarget: Boolean,
+        val usability: SceneUsability = SceneUsability.OK,
+        val sceneZh: String? = null
     )
 
     fun decide(input: Input): Guidance =
@@ -34,6 +36,20 @@ object GuidanceArbiter {
 
     private fun candidates(i: Input): List<Guidance> {
         val out = ArrayList<Guidance>(8)
+
+        // 场景本身不适合拍人像时，说什么站位姿势都没意义，直接拦在最前面
+        if (i.usability == SceneUsability.POOR) {
+            out += Guidance(
+                source = GuidanceSource.SCENE_POOR,
+                severity = Severity.WARN,
+                priority = 5,
+                text = "这里不建议拍人像",
+                detail = (i.sceneZh?.let { "识别为$it · " } ?: "") + SceneUsability.POOR.advice,
+                progress = 0.2f,
+                key = "scene_poor"
+            )
+            return out
+        }
 
         if (!i.poseEnabled) {
             out += Guidance(
@@ -139,12 +155,16 @@ object GuidanceArbiter {
         val spec = i.spec
         if (spec != null && spec.angles.isNotEmpty()) {
             PoseSpecMatcher.worst(p, spec)?.let { diff ->
+                // 角度目标没经真人采样校准前，明确标注，别让用户以为这是准的
+                val calibrated = if (spec.verified) "" else " · 目标未校准"
                 out += Guidance(
                     source = GuidanceSource.POSE_ANGLE,
                     severity = Severity.HINT,
                     priority = 60,
                     text = diff.key.coach(diff.delta),
-                    detail = "现在 %.0f，目标 %.0f（±%.0f）".format(diff.actual, diff.target, spec.tolOf(diff.key)),
+                    detail = "现在 %.0f，目标 %.0f（±%.0f）%s".format(
+                        diff.actual, diff.target, spec.tolOf(diff.key), calibrated
+                    ),
                     progress = PoseSpecMatcher.score(p, spec),
                     key = "angle_${diff.key.name}"
                 )
@@ -160,6 +180,18 @@ object GuidanceArbiter {
                 detail = "当前只引导占比最大的那一个，其他人不会被考虑",
                 progress = 1f,
                 key = "multi_person"
+            )
+        }
+
+        if (i.usability == SceneUsability.WEAK) {
+            out += Guidance(
+                source = GuidanceSource.SCENE_POOR,
+                severity = Severity.HINT,
+                priority = 90,
+                text = "这里能拍，但要挑角度",
+                detail = SceneUsability.WEAK.advice,
+                progress = 0.6f,
+                key = "scene_weak"
             )
         }
 

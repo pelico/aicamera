@@ -23,13 +23,16 @@ import com.pelico.aicamera.engine.LightingAnalyzer
 import com.pelico.aicamera.engine.MotionTracker
 import com.pelico.aicamera.engine.PoseAngles
 import com.pelico.aicamera.engine.PoseEngine
+import com.pelico.aicamera.engine.MatchContext
 import com.pelico.aicamera.engine.PoseMatcher
 import com.pelico.aicamera.engine.PoseSpec
 import com.pelico.aicamera.engine.PoseSpecStore
 import com.pelico.aicamera.engine.PoseTemplate
 import com.pelico.aicamera.engine.RuntimePolicy
+import com.pelico.aicamera.engine.SceneAffinity
 import com.pelico.aicamera.engine.SceneClassifier
 import com.pelico.aicamera.engine.ScenePrediction
+import com.pelico.aicamera.engine.SceneUsability
 import com.pelico.aicamera.engine.ScoredPose
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -84,6 +87,10 @@ class SceneViewModel(app: Application) : AndroidViewModel(app) {
     var poses by mutableStateOf<List<ScoredPose>>(emptyList())
         private set
 
+    /** 当前场景适不适合拍人像。POOR 时不推模板，直说原因 */
+    var usability by mutableStateOf(SceneUsability.OK)
+        private set
+
     var selected by mutableIntStateOf(0)
         private set
 
@@ -111,6 +118,11 @@ class SceneViewModel(app: Application) : AndroidViewModel(app) {
     private var pendingKey: String? = null
     private var pendingSince = 0L
 
+    /** 轮换去重：同一场景连续出现时换一条推荐，别十秒过去还是同一条 */
+    private var lastLabel: String? = null
+    private var labelRun = 0
+    private val rotated = LinkedHashSet<String>()
+
     val currentPose: PoseTemplate?
         get() = poses.getOrNull(selected)?.template
 
@@ -128,6 +140,7 @@ class SceneViewModel(app: Application) : AndroidViewModel(app) {
             val ctx = getApplication<Application>()
             classifier = SceneClassifier(ctx)
             scorer = AestheticScorer(ctx)
+            SceneAffinity.load(ctx)
             val specs = PoseSpecStore.load(ctx)
             specIds = specs.map { it.templateId }.toSet()
             if (policy.poseEnabled) {
@@ -136,6 +149,8 @@ class SceneViewModel(app: Application) : AndroidViewModel(app) {
                 poseAvailable = engine.available
             }
             PoseSpecStore.loadError?.let { error = it }
+            // 亲和表缺失不会崩（会回落到 tag/分组打分），但要让用户知道推荐质量下降
+            SceneAffinity.loadError?.let { error = it }
             enginesReady = true
         } catch (e: Exception) {
             error = "模型加载失败：${e.message}"
@@ -182,17 +197,58 @@ class SceneViewModel(app: Application) : AndroidViewModel(app) {
                 sunSide = light.sunSide
             )
         )
-        val ranked = PoseMatcher.rank(preds, light, boost = specIds)
+        val (usable, ranked) = rankFor(preds, light)
         val dt = (System.nanoTime() - t0) / 1_000_000f
         withContext(Dispatchers.Main) {
             sceneTop = preds
             scene = result
             lighting = light
+            usability = usable
             poses = ranked
             selected = 0
             latencyMs = dt
             applyGuidance()
         }
+    }
+
+    /**
+     * 场景 → 模板，外加两件以前没做的事：
+     *  - 场景不适宜时直接不给模板（在浴室里推荐站姿是荒谬的）
+     *  - 同一场景停留够久就轮换，避免十秒钟过去还是同一条
+     */
+    private fun rankFor(
+        preds: List<ScenePrediction>,
+        light: Lighting
+    ): Pair<SceneUsability, List<ScoredPose>> {
+        val top = preds.firstOrNull() ?: return SceneUsability.OK to emptyList()
+
+        val usable = SceneAffinity.usabilityOf(top.label)
+        if (usable == SceneUsability.POOR) {
+            lastLabel = top.label
+            labelRun = 0
+            rotated.clear()
+            return usable to emptyList()
+        }
+        if (top.label != lastLabel) {
+            lastLabel = top.label
+            labelRun = 0
+            rotated.clear()
+        }
+        labelRun++
+
+        val ctx = MatchContext(
+            personCount = person?.personCount ?: 1,
+            heightRatio = person?.heightRatio,
+            exclude = rotated
+        )
+        var ranked = PoseMatcher.rank(preds, light, ctx, boost = specIds)
+        if (labelRun >= ROTATE_AFTER && ranked.isNotEmpty()) {
+            rotated.add(ranked.first().template.id)
+            ranked = PoseMatcher.rank(preds, light, ctx.copy(exclude = rotated), boost = specIds)
+            labelRun = 0
+            if (rotated.size >= 3) rotated.clear()
+        }
+        return usable to ranked
     }
 
     private suspend fun runPose(bitmap: Bitmap) {
@@ -232,12 +288,13 @@ class SceneViewModel(app: Application) : AndroidViewModel(app) {
                 val detected =
                     if (engine != null) withContext(poseDispatcher) { runCatching { engine.detect(bitmap) }.getOrNull() }
                     else null
-                val ranked = PoseMatcher.rank(preds, light, boost = specIds)
+                val (usable, ranked) = rankFor(preds, light)
                 val score = if (withScore) synchronized(modelLock) { scorer?.score(bitmap) ?: 0f } else 0f
                 withContext(Dispatchers.Main) {
                     sceneTop = preds
                     scene = result
                     lighting = light
+                    usability = usable
                     poses = ranked
                     selected = 0
                     person = detected
@@ -260,7 +317,9 @@ class SceneViewModel(app: Application) : AndroidViewModel(app) {
                 template = currentPose,
                 spec = currentSpec,
                 tiltDeg = tiltDeg,
-                hasTarget = poses.isNotEmpty()
+                hasTarget = poses.isNotEmpty(),
+                usability = usability,
+                sceneZh = sceneTop.firstOrNull()?.zh
             )
         )
         val now = SystemClock.elapsedRealtime()
@@ -376,5 +435,7 @@ class SceneViewModel(app: Application) : AndroidViewModel(app) {
         const val STABLE_MS = 350L
         const val INSTANT_PRIORITY = 30
         const val MISS_FRAMES = 3
+        /** 同一场景连续识别多少次后换一条推荐（场景约 1.5s 一次，这里约 12s） */
+        const val ROTATE_AFTER = 8
     }
 }

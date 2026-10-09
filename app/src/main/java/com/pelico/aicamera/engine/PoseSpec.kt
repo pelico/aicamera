@@ -9,7 +9,7 @@ import kotlin.math.abs
 /**
  * 模板的**可验证部分**：任务书附录 A 的落地。
  *
- * 与 `PoseLibrary` 里的 45 条模板是两件事：
+ * 与 `PoseLibrary` 里的 57 条模板是两件事：
  * - PoseTemplate 描述「人应该怎么摆」，给人看，靠 Kanban 手工写文案
  * - PoseSpec 描述「摆对了之后关节角会是多少」，给机器比，**必须有数值才能进闭环**
  *

@@ -122,6 +122,7 @@ enum class GuidanceSource(val zh: String) {
     SHOT_SIZE("景别"),
     POSITION("站位"),
     POSE_ANGLE("姿势"),
+    SCENE_POOR("场景不宜"),
     READY("就绪"),
     FALLBACK("降级")
 }

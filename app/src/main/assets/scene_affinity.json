@@ -1,0 +1,2250 @@
+{
+ "version": 2,
+ "note": "Places365 标签 → 模板 id 的有序亲和表。由 tools/gen_affinity.py 生成，改完 PoseTemplate.kt 后重新生成。App 侧由 SceneAffinity 加载，查不到时回落到模板自身的 tags 与分组兜底。",
+ "fallback": [
+  "gen_thirds_stand",
+  "gen_sit_side",
+  "gen_low_angle_tall",
+  "gen_backlit_hair"
+ ],
+ "poor": [
+  "assembly_line",
+  "attic",
+  "auto_factory",
+  "basement",
+  "bathroom",
+  "biology_laboratory",
+  "burial_chamber",
+  "catacomb",
+  "chemistry_lab",
+  "clean_room",
+  "closet",
+  "corral",
+  "dressing_room",
+  "elevator/door",
+  "elevator_lobby",
+  "elevator_shaft",
+  "engine_room",
+  "hospital",
+  "hospital_room",
+  "jail_cell",
+  "kennel/outdoor",
+  "landfill",
+  "laundromat",
+  "locker_room",
+  "nursing_home",
+  "operating_room",
+  "physics_laboratory",
+  "repair_shop",
+  "server_room",
+  "shower",
+  "stable",
+  "storage_room",
+  "utility_room"
+ ],
+ "weak": [
+  "army_base",
+  "auto_showroom",
+  "construction_site",
+  "fire_station",
+  "gas_station",
+  "industrial_area",
+  "junkyard",
+  "loading_dock",
+  "oilrig",
+  "parking_garage/indoor",
+  "parking_lot"
+ ],
+ "map": {
+  "airfield": [
+   "field_smell_flower",
+   "field_wheat_arms",
+   "field_grass_lie",
+   "field_paddy_back"
+  ],
+  "airplane_cabin": [
+   "ride_car_profile",
+   "ride_platform_wait",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "airport_terminal": [
+   "indoor_lobby_wide",
+   "indoor_aisle_depth",
+   "indoor_mall_atrium",
+   "shop_window_sit"
+  ],
+  "alcove": [
+   "arch_frame_shot",
+   "arch_gate_center",
+   "arch_courtyard_walk",
+   "arch_stairs_lookback"
+  ],
+  "alley": [
+   "street_wall_lean",
+   "street_alley_depth",
+   "street_window_side",
+   "street_glass_reflect"
+  ],
+  "amphitheater": [
+   "arch_stairs_lookback",
+   "arch_gate_center",
+   "arch_frame_shot",
+   "arch_courtyard_walk"
+  ],
+  "amusement_arcade": [
+   "indoor_mall_atrium",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "amusement_park": [
+   "indoor_mall_atrium",
+   "campus_corridor_lookback",
+   "shop_window_sit",
+   "shop_cheek_rest"
+  ],
+  "apartment_building/outdoor": [
+   "indoor_sofa_sit",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "aquarium": [
+   "night_neon_profile",
+   "indoor_gallery_wall",
+   "indoor_aisle_depth",
+   "night_string_closeup"
+  ],
+  "aqueduct": [
+   "arch_gate_center",
+   "arch_frame_shot",
+   "arch_courtyard_walk",
+   "arch_stairs_lookback"
+  ],
+  "arcade": [
+   "indoor_mall_atrium",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "arch": [
+   "arch_frame_shot",
+   "arch_gate_center",
+   "arch_courtyard_walk",
+   "arch_stairs_lookback"
+  ],
+  "archaelogical_excavation": [
+   "arch_gate_center",
+   "arch_frame_shot",
+   "arch_courtyard_walk",
+   "arch_stairs_lookback"
+  ],
+  "archive": [
+   "indoor_desk_work",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "arena/hockey": [
+   "campus_bleacher_sit",
+   "indoor_lobby_wide",
+   "campus_corridor_lookback",
+   "gen_thirds_stand"
+  ],
+  "arena/performance": [
+   "indoor_lobby_wide",
+   "indoor_mall_atrium",
+   "shop_window_sit",
+   "shop_cheek_rest"
+  ],
+  "arena/rodeo": [
+   "campus_bleacher_sit",
+   "gen_sit_side",
+   "campus_corridor_lookback",
+   "gen_thirds_stand"
+  ],
+  "army_base": [
+   "gen_low_angle_tall",
+   "street_alley_depth",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "art_gallery": [
+   "indoor_gallery_wall",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "art_school": [
+   "indoor_desk_work",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "art_studio": [
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean",
+   "indoor_gallery_wall"
+  ],
+  "artists_loft": [
+   "indoor_desk_work",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "assembly_line": [
+   "gen_thirds_stand",
+   "gen_sit_side",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "athletic_field/outdoor": [
+   "campus_corridor_lookback",
+   "field_grass_lie",
+   "campus_bleacher_sit",
+   "gen_thirds_stand"
+  ],
+  "atrium/public": [
+   "indoor_gallery_wall",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "attic": [
+   "gen_sit_side",
+   "gen_thirds_stand",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "auditorium": [
+   "indoor_lobby_wide",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "auto_factory": [
+   "gen_thirds_stand",
+   "gen_sit_side",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "auto_showroom": [
+   "gen_thirds_stand",
+   "gen_sit_side",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "badlands": [
+   "mtn_cliff_sit",
+   "mtn_summit_arms",
+   "mtn_ridge_silhouette",
+   "mtn_path_lookback"
+  ],
+  "bakery/shop": [
+   "indoor_table_lean",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_gallery_wall"
+  ],
+  "balcony/exterior": [
+   "street_rooftop_night",
+   "street_window_side",
+   "night_neon_profile",
+   "night_string_closeup"
+  ],
+  "balcony/interior": [
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean",
+   "indoor_gallery_wall"
+  ],
+  "ball_pit": [
+   "indoor_mall_atrium",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "ballroom": [
+   "indoor_lobby_wide",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "bamboo_forest": [
+   "forest_bamboo_depth",
+   "forest_light_spot",
+   "forest_path_lookback",
+   "forest_tree_lean"
+  ],
+  "bank_vault": [
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean",
+   "indoor_gallery_wall"
+  ],
+  "banquet_hall": [
+   "indoor_table_lean",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_gallery_wall"
+  ],
+  "bar": [
+   "shop_cheek_rest",
+   "shop_window_sit",
+   "indoor_table_lean",
+   "indoor_gallery_wall"
+  ],
+  "barn": [
+   "shop_cheek_rest",
+   "shop_window_sit",
+   "indoor_table_lean",
+   "indoor_gallery_wall"
+  ],
+  "barndoor": [
+   "shop_cheek_rest",
+   "shop_window_sit",
+   "indoor_table_lean",
+   "indoor_gallery_wall"
+  ],
+  "baseball_field": [
+   "field_smell_flower",
+   "field_wheat_arms",
+   "field_grass_lie",
+   "field_paddy_back"
+  ],
+  "basement": [
+   "indoor_aisle_depth",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "basketball_court/indoor": [
+   "campus_corridor_lookback",
+   "campus_bleacher_sit",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "bathroom": [
+   "gen_thirds_stand",
+   "gen_sit_side",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "bazaar/indoor": [
+   "indoor_mall_atrium",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "bazaar/outdoor": [
+   "street_alley_depth",
+   "street_wall_lean",
+   "street_window_side",
+   "street_glass_reflect"
+  ],
+  "beach": [
+   "water_walk_away",
+   "water_look_back",
+   "water_lake_side",
+   "water_rock_sit"
+  ],
+  "beach_house": [
+   "water_look_back",
+   "water_walk_away",
+   "water_lake_side",
+   "water_rock_sit"
+  ],
+  "beauty_salon": [
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean",
+   "indoor_gallery_wall"
+  ],
+  "bedchamber": [
+   "indoor_window_read",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "bedroom": [
+   "indoor_window_read",
+   "indoor_bed_sit",
+   "indoor_sofa_sit",
+   "shop_window_sit"
+  ],
+  "beer_garden": [
+   "night_string_closeup",
+   "night_neon_profile",
+   "street_rooftop_night",
+   "night_bridge_back"
+  ],
+  "beer_hall": [
+   "indoor_table_lean",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_gallery_wall"
+  ],
+  "berth": [
+   "water_pier_depth",
+   "water_walk_away",
+   "water_look_back",
+   "water_lake_side"
+  ],
+  "biology_laboratory": [
+   "gen_thirds_stand",
+   "gen_sit_side",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "boardwalk": [
+   "water_pier_depth",
+   "water_walk_away",
+   "water_look_back",
+   "water_lake_side"
+  ],
+  "boat_deck": [
+   "water_look_back",
+   "water_walk_away",
+   "water_lake_side",
+   "water_rock_sit"
+  ],
+  "boathouse": [
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean",
+   "indoor_gallery_wall"
+  ],
+  "bookstore": [
+   "shop_bookshelf",
+   "indoor_window_read",
+   "indoor_supermarket_aisle",
+   "shop_window_sit"
+  ],
+  "booth/indoor": [
+   "indoor_table_lean",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_gallery_wall"
+  ],
+  "botanical_garden": [
+   "forest_light_spot",
+   "field_smell_flower",
+   "forest_path_lookback",
+   "forest_bamboo_depth"
+  ],
+  "bow_window/indoor": [
+   "indoor_window_read",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "bowling_alley": [
+   "indoor_mall_atrium",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "boxing_ring": [
+   "gen_thirds_stand",
+   "gen_sit_side",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "bridge": [
+   "night_bridge_back",
+   "arch_frame_shot",
+   "street_alley_depth",
+   "night_neon_profile"
+  ],
+  "building_facade": [
+   "street_glass_reflect",
+   "street_wall_lean",
+   "street_alley_depth",
+   "street_window_side"
+  ],
+  "bullring": [
+   "arch_frame_shot",
+   "gen_low_angle_tall",
+   "arch_gate_center",
+   "arch_courtyard_walk"
+  ],
+  "burial_chamber": [
+   "gen_thirds_stand",
+   "gen_sit_side",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "bus_interior": [
+   "ride_car_profile",
+   "ride_platform_wait",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "bus_station/indoor": [
+   "indoor_aisle_depth",
+   "ride_platform_wait",
+   "shop_window_sit",
+   "shop_cheek_rest"
+  ],
+  "butchers_shop": [
+   "indoor_supermarket_aisle",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "butte": [
+   "mtn_summit_arms",
+   "mtn_cliff_sit",
+   "mtn_ridge_silhouette",
+   "mtn_path_lookback"
+  ],
+  "cabin/outdoor": [
+   "indoor_bed_sit",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "cafeteria": [
+   "indoor_table_lean",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_gallery_wall"
+  ],
+  "campsite": [
+   "gen_backlit_hair",
+   "gen_sit_side",
+   "gen_thirds_stand",
+   "gen_low_angle_tall"
+  ],
+  "campus": [
+   "campus_bleacher_sit",
+   "campus_corridor_lookback",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "canal/natural": [
+   "water_lake_side",
+   "water_walk_away",
+   "water_look_back",
+   "water_rock_sit"
+  ],
+  "canal/urban": [
+   "water_walk_away",
+   "water_look_back",
+   "water_lake_side",
+   "water_rock_sit"
+  ],
+  "candy_store": [
+   "indoor_supermarket_aisle",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "canyon": [
+   "mtn_summit_arms",
+   "mtn_path_lookback",
+   "mtn_cliff_sit",
+   "mtn_ridge_silhouette"
+  ],
+  "car_interior": [
+   "ride_car_profile",
+   "ride_platform_wait",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "carrousel": [
+   "indoor_mall_atrium",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "castle": [
+   "arch_gate_center",
+   "arch_frame_shot",
+   "arch_courtyard_walk",
+   "arch_stairs_lookback"
+  ],
+  "catacomb": [
+   "indoor_aisle_depth",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "cemetery": [
+   "arch_frame_shot",
+   "gen_backlit_hair",
+   "arch_gate_center",
+   "arch_courtyard_walk"
+  ],
+  "chalet": [
+   "indoor_sofa_sit",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "chemistry_lab": [
+   "gen_thirds_stand",
+   "gen_sit_side",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "childs_room": [
+   "indoor_window_read",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "church/indoor": [
+   "indoor_gallery_wall",
+   "indoor_aisle_depth",
+   "arch_frame_shot",
+   "shop_window_sit"
+  ],
+  "church/outdoor": [
+   "arch_gate_center",
+   "arch_stairs_lookback",
+   "arch_frame_shot",
+   "arch_courtyard_walk"
+  ],
+  "classroom": [
+   "campus_corridor_lookback",
+   "campus_bleacher_sit",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "clean_room": [
+   "gen_thirds_stand",
+   "gen_sit_side",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "cliff": [
+   "water_rock_sit",
+   "mtn_cliff_sit",
+   "water_walk_away",
+   "water_look_back"
+  ],
+  "closet": [
+   "gen_sit_side",
+   "gen_thirds_stand",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "clothing_store": [
+   "indoor_supermarket_aisle",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "coast": [
+   "water_walk_away",
+   "water_look_back",
+   "water_rock_sit",
+   "water_lake_side"
+  ],
+  "cockpit": [
+   "indoor_aisle_depth",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "coffee_shop": [
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "shop_food_overhead",
+   "indoor_table_lean"
+  ],
+  "computer_room": [
+   "indoor_desk_work",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "conference_center": [
+   "indoor_lobby_wide",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "conference_room": [
+   "indoor_desk_work",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "construction_site": [
+   "street_glass_reflect",
+   "gen_low_angle_tall",
+   "street_wall_lean",
+   "street_alley_depth"
+  ],
+  "corn_field": [
+   "field_wheat_arms",
+   "field_smell_flower",
+   "field_grass_lie",
+   "field_paddy_back"
+  ],
+  "corral": [
+   "gen_thirds_stand",
+   "gen_sit_side",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "corridor": [
+   "indoor_aisle_depth",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "cottage": [
+   "indoor_sofa_sit",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "courthouse": [
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean",
+   "indoor_gallery_wall"
+  ],
+  "courtyard": [
+   "arch_courtyard_walk",
+   "arch_frame_shot",
+   "arch_gate_center",
+   "arch_stairs_lookback"
+  ],
+  "creek": [
+   "water_lake_side",
+   "water_open_arms",
+   "water_walk_away",
+   "water_look_back"
+  ],
+  "crevasse": [
+   "mtn_summit_arms",
+   "mtn_ridge_silhouette",
+   "mtn_path_lookback",
+   "mtn_cliff_sit"
+  ],
+  "crosswalk": [
+   "street_crosswalk_walk",
+   "night_traffic_stand",
+   "street_wall_lean",
+   "street_alley_depth"
+  ],
+  "dam": [
+   "water_walk_away",
+   "water_look_back",
+   "water_lake_side",
+   "water_rock_sit"
+  ],
+  "delicatessen": [
+   "indoor_table_lean",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_gallery_wall"
+  ],
+  "department_store": [
+   "indoor_mall_atrium",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "desert/sand": [
+   "gen_low_angle_tall",
+   "gen_backlit_hair",
+   "field_grass_lie",
+   "gen_thirds_stand"
+  ],
+  "desert/vegetation": [
+   "gen_backlit_hair",
+   "gen_low_angle_tall",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "desert_road": [
+   "street_alley_depth",
+   "gen_low_angle_tall",
+   "street_wall_lean",
+   "street_window_side"
+  ],
+  "diner/outdoor": [
+   "indoor_table_lean",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_gallery_wall"
+  ],
+  "dining_hall": [
+   "indoor_table_lean",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_gallery_wall"
+  ],
+  "dining_room": [
+   "indoor_table_lean",
+   "shop_food_overhead",
+   "shop_window_sit",
+   "shop_cheek_rest"
+  ],
+  "discotheque": [
+   "indoor_mall_atrium",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "doorway/outdoor": [
+   "street_wall_lean",
+   "arch_frame_shot",
+   "street_alley_depth",
+   "street_window_side"
+  ],
+  "dorm_room": [
+   "indoor_sofa_sit",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "downtown": [
+   "street_crosswalk_walk",
+   "street_glass_reflect",
+   "street_rooftop_night",
+   "night_neon_profile"
+  ],
+  "dressing_room": [
+   "gen_thirds_stand",
+   "gen_sit_side",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "driveway": [
+   "street_wall_lean",
+   "street_alley_depth",
+   "street_window_side",
+   "street_glass_reflect"
+  ],
+  "drugstore": [
+   "indoor_supermarket_aisle",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "elevator/door": [
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean",
+   "indoor_gallery_wall"
+  ],
+  "elevator_lobby": [
+   "indoor_lobby_wide",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "elevator_shaft": [
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean",
+   "indoor_gallery_wall"
+  ],
+  "embassy": [
+   "indoor_desk_work",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "engine_room": [
+   "gen_thirds_stand",
+   "gen_sit_side",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "entrance_hall": [
+   "indoor_stairs_sit",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "escalator/indoor": [
+   "indoor_stairs_sit",
+   "indoor_mall_atrium",
+   "shop_window_sit",
+   "shop_cheek_rest"
+  ],
+  "excavation": [
+   "arch_gate_center",
+   "arch_frame_shot",
+   "arch_courtyard_walk",
+   "arch_stairs_lookback"
+  ],
+  "fabric_store": [
+   "indoor_supermarket_aisle",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "farm": [
+   "field_paddy_back",
+   "field_smell_flower",
+   "field_wheat_arms",
+   "field_grass_lie"
+  ],
+  "fastfood_restaurant": [
+   "indoor_table_lean",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_gallery_wall"
+  ],
+  "field/cultivated": [
+   "field_wheat_arms",
+   "field_paddy_back",
+   "field_smell_flower",
+   "field_grass_lie"
+  ],
+  "field/wild": [
+   "field_smell_flower",
+   "field_wheat_arms",
+   "field_grass_lie",
+   "field_paddy_back"
+  ],
+  "field_road": [
+   "field_paddy_back",
+   "field_smell_flower",
+   "field_wheat_arms",
+   "field_grass_lie"
+  ],
+  "fire_escape": [
+   "indoor_stairs_sit",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "fire_station": [
+   "street_glass_reflect",
+   "gen_thirds_stand",
+   "street_wall_lean",
+   "street_alley_depth"
+  ],
+  "fishpond": [
+   "water_lake_side",
+   "water_walk_away",
+   "water_look_back",
+   "water_rock_sit"
+  ],
+  "flea_market/indoor": [
+   "indoor_supermarket_aisle",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "florist_shop/indoor": [
+   "indoor_supermarket_aisle",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "food_court": [
+   "indoor_table_lean",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_gallery_wall"
+  ],
+  "football_field": [
+   "field_smell_flower",
+   "field_wheat_arms",
+   "field_grass_lie",
+   "field_paddy_back"
+  ],
+  "forest/broadleaf": [
+   "forest_light_spot",
+   "forest_path_lookback",
+   "forest_tree_lean",
+   "forest_bamboo_depth"
+  ],
+  "forest_path": [
+   "mtn_path_lookback",
+   "forest_light_spot",
+   "forest_bamboo_depth",
+   "forest_path_lookback"
+  ],
+  "forest_road": [
+   "forest_light_spot",
+   "forest_bamboo_depth",
+   "forest_path_lookback",
+   "forest_tree_lean"
+  ],
+  "formal_garden": [
+   "arch_courtyard_walk",
+   "field_smell_flower",
+   "arch_gate_center",
+   "arch_frame_shot"
+  ],
+  "fountain": [
+   "arch_gate_center",
+   "arch_frame_shot",
+   "arch_courtyard_walk",
+   "arch_stairs_lookback"
+  ],
+  "galley": [
+   "street_wall_lean",
+   "street_alley_depth",
+   "street_window_side",
+   "street_glass_reflect"
+  ],
+  "garage/indoor": [
+   "gen_sit_side",
+   "gen_thirds_stand",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "garage/outdoor": [
+   "gen_sit_side",
+   "gen_thirds_stand",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "gas_station": [
+   "night_neon_profile",
+   "street_glass_reflect",
+   "night_string_closeup",
+   "street_rooftop_night"
+  ],
+  "gazebo/exterior": [
+   "arch_frame_shot",
+   "arch_gate_center",
+   "arch_courtyard_walk",
+   "arch_stairs_lookback"
+  ],
+  "general_store/indoor": [
+   "indoor_supermarket_aisle",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "general_store/outdoor": [
+   "indoor_supermarket_aisle",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "gift_shop": [
+   "indoor_supermarket_aisle",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "glacier": [
+   "snow_look_up",
+   "snow_footprint_back",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "golf_course": [
+   "campus_corridor_lookback",
+   "campus_bleacher_sit",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "greenhouse/indoor": [
+   "forest_light_spot",
+   "indoor_gallery_wall",
+   "forest_path_lookback",
+   "forest_bamboo_depth"
+  ],
+  "greenhouse/outdoor": [
+   "field_smell_flower",
+   "field_wheat_arms",
+   "field_grass_lie",
+   "field_paddy_back"
+  ],
+  "grotto": [
+   "arch_frame_shot",
+   "indoor_aisle_depth",
+   "arch_gate_center",
+   "arch_courtyard_walk"
+  ],
+  "gymnasium/indoor": [
+   "campus_bleacher_sit",
+   "indoor_lobby_wide",
+   "campus_corridor_lookback",
+   "gen_thirds_stand"
+  ],
+  "hangar/indoor": [
+   "indoor_lobby_wide",
+   "indoor_aisle_depth",
+   "shop_window_sit",
+   "shop_cheek_rest"
+  ],
+  "hangar/outdoor": [
+   "street_glass_reflect",
+   "gen_low_angle_tall",
+   "street_wall_lean",
+   "street_alley_depth"
+  ],
+  "harbor": [
+   "water_pier_depth",
+   "night_bridge_back",
+   "water_walk_away",
+   "water_look_back"
+  ],
+  "hardware_store": [
+   "indoor_supermarket_aisle",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "hayfield": [
+   "field_wheat_arms",
+   "field_smell_flower",
+   "field_grass_lie",
+   "field_paddy_back"
+  ],
+  "heliport": [
+   "gen_low_angle_tall",
+   "street_alley_depth",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "highway": [
+   "street_crosswalk_walk",
+   "night_traffic_stand",
+   "street_wall_lean",
+   "street_alley_depth"
+  ],
+  "home_office": [
+   "indoor_desk_work",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "home_theater": [
+   "indoor_sofa_sit",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "hospital": [
+   "indoor_lobby_wide",
+   "gen_sit_side",
+   "shop_window_sit",
+   "shop_cheek_rest"
+  ],
+  "hospital_room": [
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean",
+   "indoor_gallery_wall"
+  ],
+  "hot_spring": [
+   "water_walk_away",
+   "water_look_back",
+   "water_lake_side",
+   "water_rock_sit"
+  ],
+  "hotel/outdoor": [
+   "indoor_lobby_wide",
+   "arch_frame_shot",
+   "shop_window_sit",
+   "shop_cheek_rest"
+  ],
+  "hotel_room": [
+   "indoor_bed_sit",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "house": [
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean",
+   "indoor_gallery_wall"
+  ],
+  "hunting_lodge/outdoor": [
+   "gen_backlit_hair",
+   "forest_tree_lean",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "ice_cream_parlor": [
+   "indoor_table_lean",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_gallery_wall"
+  ],
+  "ice_floe": [
+   "snow_look_up",
+   "snow_footprint_back",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "ice_shelf": [
+   "snow_look_up",
+   "mtn_ridge_silhouette",
+   "snow_footprint_back",
+   "gen_thirds_stand"
+  ],
+  "ice_skating_rink/indoor": [
+   "snow_look_up",
+   "snow_footprint_back",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "ice_skating_rink/outdoor": [
+   "snow_look_up",
+   "snow_footprint_back",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "iceberg": [
+   "snow_look_up",
+   "snow_footprint_back",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "igloo": [
+   "snow_look_up",
+   "snow_footprint_back",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "industrial_area": [
+   "street_glass_reflect",
+   "street_alley_depth",
+   "street_wall_lean",
+   "street_window_side"
+  ],
+  "inn/outdoor": [
+   "indoor_bed_sit",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "islet": [
+   "water_walk_away",
+   "water_rock_sit",
+   "water_look_back",
+   "water_lake_side"
+  ],
+  "jacuzzi/indoor": [
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean",
+   "indoor_gallery_wall"
+  ],
+  "jail_cell": [
+   "gen_thirds_stand",
+   "gen_sit_side",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "japanese_garden": [
+   "arch_frame_shot",
+   "forest_light_spot",
+   "arch_gate_center",
+   "arch_courtyard_walk"
+  ],
+  "jewelry_shop": [
+   "indoor_supermarket_aisle",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "junkyard": [
+   "street_glass_reflect",
+   "gen_sit_side",
+   "street_wall_lean",
+   "street_alley_depth"
+  ],
+  "kasbah": [
+   "arch_courtyard_walk",
+   "arch_gate_center",
+   "arch_frame_shot",
+   "arch_stairs_lookback"
+  ],
+  "kennel/outdoor": [
+   "gen_thirds_stand",
+   "gen_sit_side",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "kindergarden_classroom": [
+   "field_smell_flower",
+   "field_wheat_arms",
+   "field_grass_lie",
+   "field_paddy_back"
+  ],
+  "kitchen": [
+   "indoor_table_lean",
+   "shop_food_overhead",
+   "shop_window_sit",
+   "shop_cheek_rest"
+  ],
+  "lagoon": [
+   "water_look_back",
+   "water_walk_away",
+   "water_lake_side",
+   "water_rock_sit"
+  ],
+  "lake/natural": [
+   "water_lake_side",
+   "water_walk_away",
+   "water_look_back",
+   "water_rock_sit"
+  ],
+  "landfill": [
+   "gen_thirds_stand",
+   "gen_sit_side",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "landing_deck": [
+   "gen_low_angle_tall",
+   "street_alley_depth",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "laundromat": [
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean",
+   "indoor_gallery_wall"
+  ],
+  "lawn": [
+   "field_grass_lie",
+   "gen_sit_side",
+   "field_smell_flower",
+   "field_wheat_arms"
+  ],
+  "lecture_room": [
+   "indoor_lobby_wide",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "legislative_chamber": [
+   "indoor_desk_work",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "library/indoor": [
+   "shop_bookshelf",
+   "indoor_desk_work",
+   "indoor_window_read",
+   "shop_window_sit"
+  ],
+  "library/outdoor": [
+   "arch_frame_shot",
+   "gen_thirds_stand",
+   "arch_gate_center",
+   "arch_courtyard_walk"
+  ],
+  "lighthouse": [
+   "arch_gate_center",
+   "arch_frame_shot",
+   "arch_courtyard_walk",
+   "arch_stairs_lookback"
+  ],
+  "living_room": [
+   "indoor_sofa_sit",
+   "indoor_window_read",
+   "indoor_bed_sit",
+   "shop_window_sit"
+  ],
+  "loading_dock": [
+   "gen_thirds_stand",
+   "gen_sit_side",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "lobby": [
+   "indoor_lobby_wide",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "lock_chamber": [
+   "gen_thirds_stand",
+   "gen_sit_side",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "locker_room": [
+   "gen_thirds_stand",
+   "gen_sit_side",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "mansion": [
+   "indoor_sofa_sit",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "manufactured_home": [
+   "indoor_sofa_sit",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "market/indoor": [
+   "indoor_supermarket_aisle",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "market/outdoor": [
+   "street_alley_depth",
+   "street_window_side",
+   "street_wall_lean",
+   "street_glass_reflect"
+  ],
+  "marsh": [
+   "water_walk_away",
+   "water_look_back",
+   "water_lake_side",
+   "water_rock_sit"
+  ],
+  "martial_arts_gym": [
+   "campus_corridor_lookback",
+   "campus_bleacher_sit",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "mausoleum": [
+   "arch_gate_center",
+   "arch_frame_shot",
+   "arch_courtyard_walk",
+   "arch_stairs_lookback"
+  ],
+  "medina": [
+   "arch_courtyard_walk",
+   "arch_gate_center",
+   "arch_frame_shot",
+   "arch_stairs_lookback"
+  ],
+  "mezzanine": [
+   "indoor_desk_work",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "moat/water": [
+   "water_walk_away",
+   "water_look_back",
+   "water_lake_side",
+   "water_rock_sit"
+  ],
+  "mosque/outdoor": [
+   "arch_gate_center",
+   "arch_frame_shot",
+   "arch_courtyard_walk",
+   "arch_stairs_lookback"
+  ],
+  "motel": [
+   "indoor_bed_sit",
+   "street_glass_reflect",
+   "shop_window_sit",
+   "shop_cheek_rest"
+  ],
+  "mountain": [
+   "mtn_ridge_silhouette",
+   "mtn_summit_arms",
+   "mtn_path_lookback",
+   "mtn_cliff_sit"
+  ],
+  "mountain_path": [
+   "mtn_ridge_silhouette",
+   "mtn_path_lookback",
+   "mtn_summit_arms",
+   "mtn_cliff_sit"
+  ],
+  "mountain_snowy": [
+   "mtn_ridge_silhouette",
+   "mtn_summit_arms",
+   "snow_look_up",
+   "mtn_path_lookback"
+  ],
+  "movie_theater/indoor": [
+   "indoor_lobby_wide",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "museum/indoor": [
+   "indoor_gallery_wall",
+   "indoor_mall_atrium",
+   "shop_bookshelf",
+   "shop_window_sit"
+  ],
+  "museum/outdoor": [
+   "indoor_gallery_wall",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "music_studio": [
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean",
+   "indoor_gallery_wall"
+  ],
+  "natural_history_museum": [
+   "indoor_gallery_wall",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "nursery": [
+   "indoor_window_read",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "nursing_home": [
+   "gen_sit_side",
+   "indoor_sofa_sit",
+   "gen_thirds_stand",
+   "gen_low_angle_tall"
+  ],
+  "oast_house": [
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean",
+   "indoor_gallery_wall"
+  ],
+  "ocean": [
+   "water_walk_away",
+   "water_look_back",
+   "water_rock_sit",
+   "water_lake_side"
+  ],
+  "office": [
+   "indoor_desk_work",
+   "indoor_lobby_wide",
+   "indoor_window_read",
+   "shop_window_sit"
+  ],
+  "office_building": [
+   "indoor_desk_work",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "office_cubicles": [
+   "indoor_desk_work",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "oilrig": [
+   "gen_low_angle_tall",
+   "street_glass_reflect",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "operating_room": [
+   "gen_thirds_stand",
+   "gen_sit_side",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "orchard": [
+   "forest_tree_lean",
+   "field_smell_flower",
+   "forest_light_spot",
+   "forest_path_lookback"
+  ],
+  "orchestra_pit": [
+   "indoor_lobby_wide",
+   "indoor_aisle_depth",
+   "shop_window_sit",
+   "shop_cheek_rest"
+  ],
+  "pagoda": [
+   "arch_gate_center",
+   "arch_frame_shot",
+   "arch_courtyard_walk",
+   "arch_stairs_lookback"
+  ],
+  "palace": [
+   "arch_gate_center",
+   "arch_frame_shot",
+   "arch_courtyard_walk",
+   "arch_stairs_lookback"
+  ],
+  "pantry": [
+   "indoor_supermarket_aisle",
+   "indoor_table_lean",
+   "shop_window_sit",
+   "shop_cheek_rest"
+  ],
+  "park": [
+   "forest_light_spot",
+   "field_grass_lie",
+   "gen_backlit_hair",
+   "forest_path_lookback"
+  ],
+  "parking_garage/indoor": [
+   "indoor_aisle_depth",
+   "gen_thirds_stand",
+   "shop_window_sit",
+   "shop_cheek_rest"
+  ],
+  "parking_garage/outdoor": [
+   "street_rooftop_night",
+   "street_glass_reflect",
+   "night_neon_profile",
+   "night_string_closeup"
+  ],
+  "parking_lot": [
+   "street_glass_reflect",
+   "street_rooftop_night",
+   "gen_thirds_stand",
+   "street_wall_lean"
+  ],
+  "pasture": [
+   "field_grass_lie",
+   "field_smell_flower",
+   "field_wheat_arms",
+   "field_paddy_back"
+  ],
+  "patio": [
+   "gen_sit_side",
+   "indoor_table_lean",
+   "gen_thirds_stand",
+   "gen_low_angle_tall"
+  ],
+  "pavilion": [
+   "arch_frame_shot",
+   "arch_gate_center",
+   "arch_courtyard_walk",
+   "arch_stairs_lookback"
+  ],
+  "pet_shop": [
+   "indoor_supermarket_aisle",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "pharmacy": [
+   "indoor_supermarket_aisle",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "phone_booth": [
+   "street_window_side",
+   "night_neon_profile",
+   "street_wall_lean",
+   "street_alley_depth"
+  ],
+  "physics_laboratory": [
+   "gen_thirds_stand",
+   "gen_sit_side",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "picnic_area": [
+   "field_grass_lie",
+   "gen_sit_side",
+   "field_smell_flower",
+   "field_wheat_arms"
+  ],
+  "pier": [
+   "water_pier_depth",
+   "night_bridge_back",
+   "water_walk_away",
+   "water_look_back"
+  ],
+  "pizzeria": [
+   "indoor_table_lean",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_gallery_wall"
+  ],
+  "playground": [
+   "campus_corridor_lookback",
+   "gen_sit_side",
+   "campus_bleacher_sit",
+   "gen_thirds_stand"
+  ],
+  "playroom": [
+   "indoor_sofa_sit",
+   "campus_corridor_lookback",
+   "shop_window_sit",
+   "shop_cheek_rest"
+  ],
+  "plaza": [
+   "street_crosswalk_walk",
+   "night_neon_profile",
+   "night_string_closeup",
+   "street_wall_lean"
+  ],
+  "pond": [
+   "water_lake_side",
+   "water_walk_away",
+   "water_look_back",
+   "water_rock_sit"
+  ],
+  "porch": [
+   "gen_sit_side",
+   "gen_thirds_stand",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "promenade": [
+   "water_pier_depth",
+   "street_alley_depth",
+   "night_bridge_back",
+   "water_walk_away"
+  ],
+  "pub/indoor": [
+   "indoor_table_lean",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_gallery_wall"
+  ],
+  "racecourse": [
+   "campus_corridor_lookback",
+   "campus_bleacher_sit",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "raceway": [
+   "campus_corridor_lookback",
+   "campus_bleacher_sit",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "raft": [
+   "water_lake_side",
+   "water_walk_away",
+   "water_look_back",
+   "water_rock_sit"
+  ],
+  "railroad_track": [
+   "street_alley_depth",
+   "gen_low_angle_tall",
+   "street_wall_lean",
+   "street_window_side"
+  ],
+  "rainforest": [
+   "forest_light_spot",
+   "forest_path_lookback",
+   "forest_bamboo_depth",
+   "forest_tree_lean"
+  ],
+  "reception": [
+   "indoor_lobby_wide",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "recreation_room": [
+   "indoor_sofa_sit",
+   "indoor_table_lean",
+   "shop_window_sit",
+   "shop_cheek_rest"
+  ],
+  "repair_shop": [
+   "gen_thirds_stand",
+   "gen_sit_side",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "residential_neighborhood": [
+   "street_wall_lean",
+   "street_alley_depth",
+   "street_window_side",
+   "street_glass_reflect"
+  ],
+  "restaurant": [
+   "indoor_table_lean",
+   "shop_window_sit",
+   "shop_food_overhead",
+   "shop_cheek_rest"
+  ],
+  "restaurant_kitchen": [
+   "indoor_table_lean",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_gallery_wall"
+  ],
+  "restaurant_patio": [
+   "indoor_table_lean",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_gallery_wall"
+  ],
+  "rice_paddy": [
+   "field_paddy_back",
+   "field_smell_flower",
+   "field_wheat_arms",
+   "field_grass_lie"
+  ],
+  "river": [
+   "water_lake_side",
+   "water_open_arms",
+   "water_walk_away",
+   "water_look_back"
+  ],
+  "rock_arch": [
+   "water_rock_sit",
+   "mtn_cliff_sit",
+   "water_walk_away",
+   "water_look_back"
+  ],
+  "roof_garden": [
+   "street_rooftop_night",
+   "gen_backlit_hair",
+   "night_neon_profile",
+   "night_string_closeup"
+  ],
+  "rope_bridge": [
+   "street_wall_lean",
+   "street_alley_depth",
+   "street_window_side",
+   "street_glass_reflect"
+  ],
+  "ruin": [
+   "arch_frame_shot",
+   "arch_gate_center",
+   "arch_courtyard_walk",
+   "arch_stairs_lookback"
+  ],
+  "runway": [
+   "gen_low_angle_tall",
+   "street_alley_depth",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "sandbox": [
+   "campus_corridor_lookback",
+   "field_grass_lie",
+   "campus_bleacher_sit",
+   "gen_thirds_stand"
+  ],
+  "sauna": [
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean",
+   "indoor_gallery_wall"
+  ],
+  "schoolhouse": [
+   "campus_corridor_lookback",
+   "campus_bleacher_sit",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "science_museum": [
+   "indoor_gallery_wall",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "server_room": [
+   "gen_thirds_stand",
+   "gen_sit_side",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "shed": [
+   "gen_sit_side",
+   "gen_thirds_stand",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "shoe_shop": [
+   "indoor_supermarket_aisle",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "shopfront": [
+   "street_glass_reflect",
+   "street_window_side",
+   "street_wall_lean",
+   "street_alley_depth"
+  ],
+  "shopping_mall/indoor": [
+   "indoor_mall_atrium",
+   "indoor_supermarket_aisle",
+   "indoor_gallery_wall",
+   "shop_window_sit"
+  ],
+  "shower": [
+   "gen_thirds_stand",
+   "gen_sit_side",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "ski_resort": [
+   "snow_look_up",
+   "snow_footprint_back",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "ski_slope": [
+   "snow_look_up",
+   "snow_footprint_back",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "sky": [
+   "gen_low_angle_tall",
+   "gen_backlit_hair",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "skyscraper": [
+   "street_glass_reflect",
+   "gen_low_angle_tall",
+   "street_wall_lean",
+   "street_alley_depth"
+  ],
+  "slum": [
+   "street_wall_lean",
+   "street_alley_depth",
+   "street_window_side",
+   "street_glass_reflect"
+  ],
+  "snowfield": [
+   "snow_look_up",
+   "snow_footprint_back",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "soccer_field": [
+   "campus_bleacher_sit",
+   "campus_corridor_lookback",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "stable": [
+   "gen_thirds_stand",
+   "gen_sit_side",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "stadium/baseball": [
+   "campus_bleacher_sit",
+   "gen_low_angle_tall",
+   "campus_corridor_lookback",
+   "gen_thirds_stand"
+  ],
+  "stadium/football": [
+   "campus_bleacher_sit",
+   "gen_low_angle_tall",
+   "campus_corridor_lookback",
+   "gen_thirds_stand"
+  ],
+  "stadium/soccer": [
+   "campus_bleacher_sit",
+   "gen_low_angle_tall",
+   "campus_corridor_lookback",
+   "gen_thirds_stand"
+  ],
+  "stage/indoor": [
+   "indoor_lobby_wide",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "stage/outdoor": [
+   "indoor_lobby_wide",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "staircase": [
+   "indoor_stairs_sit",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "storage_room": [
+   "gen_thirds_stand",
+   "gen_sit_side",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "street": [
+   "street_wall_lean",
+   "street_crosswalk_walk",
+   "street_alley_depth",
+   "night_neon_profile"
+  ],
+  "subway_station/platform": [
+   "ride_platform_wait",
+   "ride_car_profile",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "supermarket": [
+   "indoor_supermarket_aisle",
+   "indoor_aisle_depth",
+   "shop_window_sit",
+   "shop_cheek_rest"
+  ],
+  "sushi_bar": [
+   "indoor_table_lean",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_gallery_wall"
+  ],
+  "swamp": [
+   "water_walk_away",
+   "water_look_back",
+   "water_lake_side",
+   "water_rock_sit"
+  ],
+  "swimming_hole": [
+   "water_open_arms",
+   "water_walk_away",
+   "water_look_back",
+   "water_lake_side"
+  ],
+  "swimming_pool/indoor": [
+   "water_lake_side",
+   "indoor_lobby_wide",
+   "water_walk_away",
+   "water_look_back"
+  ],
+  "swimming_pool/outdoor": [
+   "water_lake_side",
+   "water_open_arms",
+   "water_walk_away",
+   "water_look_back"
+  ],
+  "synagogue/outdoor": [
+   "arch_gate_center",
+   "arch_frame_shot",
+   "arch_courtyard_walk",
+   "arch_stairs_lookback"
+  ],
+  "television_room": [
+   "indoor_sofa_sit",
+   "indoor_bed_sit",
+   "shop_window_sit",
+   "shop_cheek_rest"
+  ],
+  "television_studio": [
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean",
+   "indoor_gallery_wall"
+  ],
+  "temple/asia": [
+   "arch_gate_center",
+   "arch_frame_shot",
+   "arch_courtyard_walk",
+   "arch_stairs_lookback"
+  ],
+  "throne_room": [
+   "indoor_lobby_wide",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "ticket_booth": [
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean",
+   "indoor_gallery_wall"
+  ],
+  "topiary_garden": [
+   "field_smell_flower",
+   "field_wheat_arms",
+   "field_grass_lie",
+   "field_paddy_back"
+  ],
+  "tower": [
+   "arch_frame_shot",
+   "gen_low_angle_tall",
+   "arch_gate_center",
+   "arch_courtyard_walk"
+  ],
+  "toyshop": [
+   "indoor_supermarket_aisle",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "train_interior": [
+   "ride_car_profile",
+   "ride_platform_wait",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "train_station/platform": [
+   "ride_platform_wait",
+   "ride_car_profile",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "tree_farm": [
+   "forest_light_spot",
+   "forest_bamboo_depth",
+   "forest_tree_lean",
+   "forest_path_lookback"
+  ],
+  "tree_house": [
+   "forest_tree_lean",
+   "forest_light_spot",
+   "forest_path_lookback",
+   "forest_bamboo_depth"
+  ],
+  "trench": [
+   "street_alley_depth",
+   "gen_low_angle_tall",
+   "street_wall_lean",
+   "street_window_side"
+  ],
+  "tundra": [
+   "mtn_ridge_silhouette",
+   "snow_look_up",
+   "mtn_summit_arms",
+   "mtn_path_lookback"
+  ],
+  "underwater/ocean_deep": [
+   "water_walk_away",
+   "water_look_back",
+   "water_lake_side",
+   "water_rock_sit"
+  ],
+  "utility_room": [
+   "gen_thirds_stand",
+   "gen_sit_side",
+   "gen_low_angle_tall",
+   "gen_backlit_hair"
+  ],
+  "valley": [
+   "mtn_ridge_silhouette",
+   "mtn_path_lookback",
+   "mtn_cliff_sit",
+   "mtn_summit_arms"
+  ],
+  "vegetable_garden": [
+   "field_smell_flower",
+   "field_paddy_back",
+   "field_wheat_arms",
+   "field_grass_lie"
+  ],
+  "veterinarians_office": [
+   "indoor_desk_work",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "viaduct": [
+   "street_alley_depth",
+   "night_bridge_back",
+   "street_wall_lean",
+   "street_window_side"
+  ],
+  "village": [
+   "street_alley_depth",
+   "arch_courtyard_walk",
+   "street_wall_lean",
+   "street_window_side"
+  ],
+  "vineyard": [
+   "field_smell_flower",
+   "field_wheat_arms",
+   "field_grass_lie",
+   "field_paddy_back"
+  ],
+  "volcano": [
+   "mtn_summit_arms",
+   "mtn_ridge_silhouette",
+   "mtn_path_lookback",
+   "mtn_cliff_sit"
+  ],
+  "volleyball_court/outdoor": [
+   "campus_corridor_lookback",
+   "campus_bleacher_sit",
+   "gen_thirds_stand",
+   "gen_sit_side"
+  ],
+  "waiting_room": [
+   "indoor_lobby_wide",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "water_park": [
+   "water_open_arms",
+   "water_lake_side",
+   "water_walk_away",
+   "water_look_back"
+  ],
+  "water_tower": [
+   "arch_gate_center",
+   "arch_frame_shot",
+   "arch_courtyard_walk",
+   "arch_stairs_lookback"
+  ],
+  "waterfall": [
+   "water_open_arms",
+   "water_walk_away",
+   "water_look_back",
+   "water_lake_side"
+  ],
+  "watering_hole": [
+   "water_lake_side",
+   "field_grass_lie",
+   "water_walk_away",
+   "water_look_back"
+  ],
+  "wave": [
+   "water_walk_away",
+   "water_look_back",
+   "water_lake_side",
+   "water_rock_sit"
+  ],
+  "wet_bar": [
+   "shop_cheek_rest",
+   "shop_window_sit",
+   "indoor_table_lean",
+   "indoor_gallery_wall"
+  ],
+  "wheat_field": [
+   "field_wheat_arms",
+   "field_smell_flower",
+   "field_grass_lie",
+   "field_paddy_back"
+  ],
+  "wind_farm": [
+   "field_smell_flower",
+   "field_wheat_arms",
+   "field_grass_lie",
+   "field_paddy_back"
+  ],
+  "windmill": [
+   "arch_gate_center",
+   "arch_frame_shot",
+   "arch_courtyard_walk",
+   "arch_stairs_lookback"
+  ],
+  "yard": [
+   "gen_backlit_hair",
+   "gen_sit_side",
+   "gen_thirds_stand",
+   "gen_low_angle_tall"
+  ],
+  "youth_hostel": [
+   "indoor_bed_sit",
+   "shop_window_sit",
+   "shop_cheek_rest",
+   "indoor_table_lean"
+  ],
+  "zen_garden": [
+   "field_smell_flower",
+   "field_wheat_arms",
+   "field_grass_lie",
+   "field_paddy_back"
+  ]
+ }
+}

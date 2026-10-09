@@ -131,14 +131,28 @@ fun AnalyzeScreen(vm: SceneViewModel) {
                         modifier = Modifier.padding(bottom = 10.dp)
                     )
                 }
-                Text(
-                    text = "下次在这儿可以这样拍：",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(top = 6.dp)
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                vm.poses.forEach { scored ->
-                    PoseCard(scored = scored, modifier = Modifier.padding(bottom = 10.dp))
+                if (vm.usability == com.pelico.aicamera.engine.SceneUsability.POOR) {
+                    Text(
+                        text = "这个场景就不该在这儿拍",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(top = 6.dp)
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = com.pelico.aicamera.engine.SceneUsability.POOR.advice,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                } else {
+                    Text(
+                        text = "下次在这儿可以这样拍：",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(top = 6.dp)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    vm.poses.forEach { scored ->
+                        PoseCard(scored = scored, modifier = Modifier.padding(bottom = 10.dp))
+                    }
                 }
         } else if (photo != null) {
             Spacer(modifier = Modifier.height(14.dp))

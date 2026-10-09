@@ -437,6 +437,38 @@ object PoseLibrary {
             note = "玻璃反光既是光源也是层次，比纯背景高级。"
         ),
 
+        PoseTemplate(
+            id = "street_glass_reflect",
+            name = "玻璃幕墙反射",
+            group = SceneGroup.STREET,
+            tags = listOf("building_facade", "skyscraper", "shopfront", "downtown", "office_building", "atrium/public", "hotel/outdoor"),
+            placement = Placement(cx = 0.38f, footY = 0.84f, height = 0.54f),
+            figure = FigurePose(facing = BodyFacing.SIDE_45, armNearDeg = 28f, armFarDeg = -18f, legSpread = 0.12f, lean = 0.08f),
+            steps = listOf(
+                "站在玻璃幕墙前 1 米左右",
+                "侧身 45°，让玻璃映出对街的建筑",
+                "视线看向玻璃里的倒影，不要看镜头",
+                "摄影师稍微侧一点，避免自己被映进画面"
+            ),
+            note = "玻璃反射能把两层空间叠在一起。晴天和蓝调时刻反射最强。"
+        ),
+        PoseTemplate(
+            id = "street_rooftop_night",
+            name = "天台夜景剪影",
+            group = SceneGroup.NIGHT,
+            tags = listOf("parking_garage/outdoor", "roof_garden", "balcony/exterior", "terrace", "rooftop", "skyscraper", "downtown"),
+            placement = Placement(cx = 0.34f, footY = 0.86f, height = 0.5f),
+            figure = FigurePose(facing = BodyFacing.SIDE_90, armNearDeg = 36f, armFarDeg = -14f, legSpread = 0.16f, lean = -0.1f),
+            times = setOf(TimeOfDay.NIGHT, TimeOfDay.DUSK),
+            steps = listOf(
+                "站在天台边缘内侧，注意安全",
+                "让城市灯光在身后铺开",
+                "侧身站，双臂自然下垂或抱臂",
+                "摄影师蹲低，把天际线压到画面下三分之一"
+            ),
+            note = "天台夜景一定要欠曝一点，灯才有光斑。人脸靠屏幕补光或路灯侧打。"
+        ),
+
         // ---------------- 夜景 · 灯光 ----------------
         PoseTemplate(
             id = "night_neon_profile",
@@ -572,6 +604,181 @@ object PoseLibrary {
                 "桌面保持干净，只留一两件道具"
             ),
             note = "俯拍桌面要正上方，斜着拍盘子会变成椭圆。"
+        ),
+
+        // ---------------- 室内 · 日常 ----------------
+        // 这一组是补短板用的：Places365 里 SHOP 分组承接了 112 个标签
+        // （办公室、卧室、客厅、电梯、商场、展馆…），原先只有 4 条咖啡馆模板，
+        // 导致在办公室举起手机会给你推荐「书架间回眸」。
+        PoseTemplate(
+            id = "indoor_sofa_sit",
+            name = "沙发上侧坐",
+            group = SceneGroup.SHOP,
+            tags = listOf("living_room", "home_theater", "dorm_room", "mansion", "cottage", "chalet", "youth_hostel", "apartment_building/outdoor"),
+            placement = Placement(cx = 0.36f, footY = 0.74f, height = 0.48f),
+            figure = FigurePose(facing = BodyFacing.SIDE_45, armNearDeg = 46f, armFarDeg = -16f, legSpread = 0.14f, lean = 0.1f),
+            steps = listOf(
+                "坐在沙发靠外的三分之一，别窝进角落",
+                "侧身坐，两腿并拢斜向画面内",
+                "一只手搭在沙发扶手上，另一只手自然放膝上",
+                "摄影师蹲到比坐姿视线略低一点"
+            ),
+            note = "窝进沙发会把人拍成一团。坐靠外、挺腰，肩线才出得来。"
+        ),
+        PoseTemplate(
+            id = "indoor_window_read",
+            name = "窗边低头翻书",
+            group = SceneGroup.SHOP,
+            tags = listOf("bedroom", "childs_room", "nursery", "bow_window/indoor", "dorm_room", "study_room", "home_office"),
+            placement = Placement(cx = 0.42f, footY = 0.8f, height = 0.46f),
+            figure = FigurePose(facing = BodyFacing.SIDE_45, armNearDeg = 70f, armFarDeg = 62f, legSpread = 0.1f, lean = 0.22f, headTurn = -0.4f),
+            prop = "一本书",
+            steps = listOf(
+                "侧身坐在窗边，让窗光从侧前方来",
+                "低头看书，只露下颌线和睫毛",
+                "双手捧书，书抬到胸口高度",
+                "摄影师与窗成 90° 站位，避免逆光糊脸"
+            ),
+            note = "低头时最容易显双下巴。下巴微收、书抬高一点，颈线就出来了。"
+        ),
+        PoseTemplate(
+            id = "indoor_desk_work",
+            name = "桌前专注半身",
+            group = SceneGroup.SHOP,
+            tags = listOf("office", "computer_room", "conference_room", "embassy", "legislative_chamber", "artists_loft", "art_school", "archive"),
+            placement = Placement(cx = 0.6f, footY = 0.86f, height = 0.56f),
+            figure = FigurePose(facing = BodyFacing.SIDE_45, armNearDeg = 78f, armFarDeg = 66f, legSpread = 0.06f, lean = 0.26f),
+            prop = "笔或键盘",
+            steps = listOf(
+                "侧身坐在桌前，只拍腰以上",
+                "一手搭在键盘或桌面上，做正在做事的状态",
+                "视线看屏幕或桌面，不要看镜头",
+                "摄影师站侧面 45°，桌面只留一条边"
+            ),
+            note = "工作照最怕摆拍感。让人真的在做一件事，手上有动作就不会僵。"
+        ),
+        PoseTemplate(
+            id = "indoor_bed_sit",
+            name = "床边晨光侧坐",
+            group = SceneGroup.SHOP,
+            tags = listOf("hotel", "hotel_room", "bedchamber", "bedroom", "cabin/outdoor", "inn/outdoor", "youth_hostel", "guest_house"),
+            placement = Placement(cx = 0.34f, footY = 0.72f, height = 0.44f),
+            figure = FigurePose(facing = BodyFacing.SIDE_90, armNearDeg = 30f, armFarDeg = -14f, legSpread = 0.12f, lean = -0.12f, headTurn = 0.3f),
+            steps = listOf(
+                "坐在床沿，背朝窗户",
+                "让晨光从身后勾出头发轮廓",
+                "双手撑在身后，身体微微后仰",
+                "摄影师正面平视，人脸要靠窗光补亮"
+            ),
+            note = "逆光一定要给脸补光，否则只剩一个黑剪影。开窗纱帘可以柔化。"
+        ),
+        PoseTemplate(
+            id = "indoor_gallery_wall",
+            name = "展墙前侧身",
+            group = SceneGroup.SHOP,
+            tags = listOf("museum", "art_gallery", "science_museum", "natural_history_museum", "atrium/public", "art_school", "artists_loft", "exhibition_hall"),
+            placement = Placement(cx = 0.62f, footY = 0.82f, height = 0.52f),
+            figure = FigurePose(facing = BodyFacing.SIDE_45, armNearDeg = 34f, armFarDeg = -20f, legSpread = 0.12f, lean = 0.08f),
+            steps = listOf(
+                "站在一面干净展墙前 1.5 米，别贴墙",
+                "侧身 45°，视线看向旁边那幅作品",
+                "一只手自然下垂，另一只手可以插兜",
+                "摄影师退远，让展墙占画面三分之二"
+            ),
+            note = "离墙 1.5 米是关键：贴墙会在身后留下难看的硬阴影。"
+        ),
+        PoseTemplate(
+            id = "indoor_mall_atrium",
+            name = "中庭仰拍全身",
+            group = SceneGroup.SHOP,
+            tags = listOf("shopping_mall", "atrium/public", "department_store", "mezzanine", "escalator/indoor", "arcade", "bazaar/indoor"),
+            placement = Placement(cx = 0.5f, footY = 0.88f, height = 0.62f),
+            figure = FigurePose(facing = BodyFacing.FRONT, armNearDeg = 26f, armFarDeg = -22f, legSpread = 0.16f),
+            camera = CameraAngle.LOW,
+            steps = listOf(
+                "站在中庭挑空处正下方",
+                "摄影师躺低或贴地仰拍",
+                "人物站画面正中，让穹顶线条向四周散开",
+                "手可以扶栏杆或插兜，避免僵直"
+            ),
+            note = "中庭的对称挑空是天然的广角题材。手机贴地仰拍，腿会被拉长。"
+        ),
+        PoseTemplate(
+            id = "indoor_stairs_sit",
+            name = "楼梯上侧坐",
+            group = SceneGroup.SHOP,
+            tags = listOf("staircase", "fire_escape", "escalator/indoor", "atrium/public", "mezzanine", "entrance_hall"),
+            placement = Placement(cx = 0.42f, footY = 0.78f, height = 0.46f),
+            figure = FigurePose(facing = BodyFacing.SIDE_45, armNearDeg = 52f, armFarDeg = -18f, legSpread = 0.18f, lean = 0.14f),
+            steps = listOf(
+                "坐在楼梯中段，别坐最上面一级",
+                "一腿上一级、一腿下一级，自然错开",
+                "一手撑台阶，一手搭在膝上",
+                "摄影师站在下一层的平台上平视"
+            ),
+            note = "台阶的斜线本身就是引导线。两腿错开高度，比并排坐好看得多。"
+        ),
+        PoseTemplate(
+            id = "indoor_table_lean",
+            name = "餐桌前俯身",
+            group = SceneGroup.SHOP,
+            tags = listOf("restaurant", "restaurant_patio", "food_court", "pizzeria", "diner/outdoor", "cafeteria", "beer_hall", "pub/indoor", "sushi_bar", "delicatessen", "bakery/shop", "ice_cream_parlor"),
+            placement = Placement(cx = 0.42f, footY = 0.84f, height = 0.5f),
+            figure = FigurePose(facing = BodyFacing.FRONT, armNearDeg = 72f, armFarDeg = 64f, legSpread = 0.08f, lean = 0.2f),
+            prop = "餐点",
+            steps = listOf(
+                "坐在桌前，身体略微前倾",
+                "双手放桌面，做出要开动的样子",
+                "抬头看镜头笑，或者看向餐点",
+                "摄影师在对面，桌面占画面下三分之一"
+            ),
+            note = "桌上别摆太满。留白比菜品更重要，一两件就够。"
+        ),
+        PoseTemplate(
+            id = "indoor_lobby_wide",
+            name = "大堂广角站",
+            group = SceneGroup.SHOP,
+            tags = listOf("lobby", "reception", "entrance_hall", "banquet_hall", "hotel", "mezzanine", "waiting_room", "conference_room"),
+            placement = Placement(cx = 0.34f, footY = 0.86f, height = 0.58f),
+            figure = FigurePose(facing = BodyFacing.SIDE_45, armNearDeg = 24f, armFarDeg = -16f, legSpread = 0.14f, lean = 0.06f),
+            steps = listOf(
+                "站在一侧，把大堂的纵深留在人物背后",
+                "侧身 45°，重心放在后腿",
+                "一只手插兜或拎包，另一只手自然下垂",
+                "摄影师退到对角，用广角把空间收进来"
+            ),
+            note = "大堂的看点是空间。人不要站正中，占三分之一就好。"
+        ),
+        PoseTemplate(
+            id = "indoor_aisle_depth",
+            name = "走廊纵深走",
+            group = SceneGroup.SHOP,
+            tags = listOf("corridor", "hallway", "arcade", "tunnel/indoor", "basement", "catacomb", "cellar", "cloister/indoor", "cockpit"),
+            placement = Placement(cx = 0.5f, footY = 0.84f, height = 0.4f),
+            figure = FigurePose(facing = BodyFacing.BACK, armNearDeg = 20f, armFarDeg = 12f, legSpread = 0.24f),
+            steps = listOf(
+                "站在走廊正中间，往深处走",
+                "摄影师蹲低到膝盖高度",
+                "人物走到画面上三分之一处停下",
+                "脚落在地砖接缝上再按快门"
+            ),
+            note = "走廊是最强的天然引导线。人越小纵深越强，别怕人小。"
+        ),
+        PoseTemplate(
+            id = "indoor_supermarket_aisle",
+            name = "货架过道回眸",
+            group = SceneGroup.SHOP,
+            tags = listOf("supermarket", "market/indoor", "bazaar/indoor", "delicatessen", "general_store", "flea_market", "florist", "gift_shop", "toyshop", "hardware_store"),
+            placement = Placement(cx = 0.6f, footY = 0.82f, height = 0.5f),
+            figure = FigurePose(facing = BodyFacing.LOOK_BACK, armNearDeg = 44f, armFarDeg = -18f, legSpread = 0.14f, headTurn = 0.8f),
+            prop = "购物篮",
+            steps = listOf(
+                "站在货架过道中间，单手挎篮",
+                "另一只手去够货架上的东西",
+                "听到喊声回头看镜头",
+                "摄影师退到过道尽头用长焦压扁空间"
+            ),
+            note = "货架颜色杂，穿素一点才不会淹没在背景里。"
         ),
 
         // ---------------- 建筑 · 古建 ----------------
