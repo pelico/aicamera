@@ -3,8 +3,8 @@ package com.pelico.aicamera.ui
 import android.content.ContentValues
 import android.os.SystemClock
 import android.provider.MediaStore
-import android.util.Size
 import android.widget.Toast
+import androidx.camera.core.AspectRatio
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
@@ -12,7 +12,6 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,7 +25,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -53,24 +53,29 @@ import com.pelico.aicamera.util.toRotatedBitmap
 import kotlinx.coroutines.delay
 import java.util.concurrent.Executors
 
-/** 场景变化很慢，1.5 秒一次完全够用，也省电 */
-private const val SCENE_INTERVAL_MS = 1500L
+/** 预览与分析都是 4:3，叠加层按这个宽高比算可视矩形 */
+private const val CONTENT_ASPECT = 3f / 4f
 
 @Composable
 fun CameraScreen(vm: SceneViewModel) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
+    val policy = vm.policy
 
-    val previewView = remember { PreviewView(context) }
+    val previewView = remember {
+        PreviewView(context).apply { scaleType = PreviewView.ScaleType.FIT_CENTER }
+    }
     val analyzerExecutor = remember { Executors.newSingleThreadExecutor() }
     var imageCapture by remember { mutableStateOf<ImageCapture?>(null) }
 
     var showGuides by remember { mutableStateOf(true) }
+    var showSteps by remember { mutableStateOf(false) }
     var tilt by remember { mutableFloatStateOf(0f) }
 
     val pose = vm.currentPose
-    val scene = vm.currentScene
-    val lighting = vm.lighting
+    val scene = vm.scene
+    val person = vm.person
+    val guidance = vm.guidance
 
     LaunchedEffect(Unit) {
         vm.ensureEngines()
@@ -84,7 +89,8 @@ fun CameraScreen(vm: SceneViewModel) {
     LaunchedEffect(Unit) {
         while (true) {
             tilt = vm.motion.tiltDeg
-            delay(80)
+            vm.refreshGuidance()
+            delay(100)
         }
     }
 
@@ -94,23 +100,31 @@ fun CameraScreen(vm: SceneViewModel) {
             {
                 runCatching {
                     val provider = providerFuture.get()
-                    val preview = Preview.Builder().build().also {
-                        it.setSurfaceProvider(previewView.surfaceProvider)
-                    }
+                    val preview = Preview.Builder()
+                        .setTargetAspectRatio(AspectRatio.RATIO_4_3)
+                        .build()
+                        .also { it.setSurfaceProvider(previewView.surfaceProvider) }
                     val capture = ImageCapture.Builder()
                         .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
                         .build()
                     val analysis = ImageAnalysis.Builder()
-                        .setTargetResolution(Size(320, 240))
+                        .setTargetResolution(policy.analysisSize)
                         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                         .build()
 
-                    var lastRun = 0L
+                    var lastScene = 0L
+                    var lastPose = 0L
                     analysis.setAnalyzer(analyzerExecutor) { proxy ->
                         val now = SystemClock.elapsedRealtime()
-                        if (now - lastRun >= SCENE_INTERVAL_MS) {
-                            lastRun = now
-                            runCatching { vm.analyze(proxy.toRotatedBitmap()) }
+                        // 两条独立节奏：场景慢、姿态快，互不阻塞
+                        val needScene = now - lastScene >= policy.sceneIntervalMs
+                        val needPose = policy.poseEnabled &&
+                            vm.poseAvailable &&
+                            now - lastPose >= policy.poseIntervalMs
+                        if (needScene) lastScene = now
+                        if (needPose) lastPose = now
+                        if (needScene || needPose) {
+                            runCatching { vm.analyzeFrame(proxy.toRotatedBitmap(), needScene, needPose) }
                         }
                         proxy.close()
                     }
@@ -168,8 +182,11 @@ fun CameraScreen(vm: SceneViewModel) {
         SceneOverlay(
             placement = pose?.placement,
             figure = pose?.figure,
+            person = person,
             showThirds = showGuides,
             tiltDeg = tilt,
+            srcAspect = CONTENT_ASPECT,
+            progress = guidance?.progress ?: 0f,
             modifier = Modifier.fillMaxSize()
         )
 
@@ -194,18 +211,18 @@ fun CameraScreen(vm: SceneViewModel) {
                 } else {
                     Column {
                         Text(
-                            text = "${scene.zh}  ${(scene.prob * 100).toInt()}%",
+                            text = "${scene.coarse.zh}  ${(scene.coarseProb * 100).toInt()}%",
                             style = MaterialTheme.typography.titleSmall,
                             color = Color.White
                         )
                         Text(
-                            text = scene.label,
+                            text = scene.top.firstOrNull()?.zh ?: "",
                             style = MaterialTheme.typography.bodySmall,
                             color = Color.White.copy(alpha = 0.7f)
                         )
                     }
                     Spacer(modifier = Modifier.width(10.dp))
-                    lighting?.let {
+                    vm.lighting?.let {
                         Text(
                             text = it.describe(),
                             style = MaterialTheme.typography.bodySmall,
@@ -222,23 +239,71 @@ fun CameraScreen(vm: SceneViewModel) {
                 .navigationBarsPadding()
                 .padding(12.dp)
         ) {
+            GuidanceBanner(guidance = guidance)
+
             if (pose != null) {
-                val scored = vm.poses.getOrNull(vm.selected)
-                if (scored != null) {
-                    PoseCard(scored = scored, modifier = Modifier.fillMaxWidth())
-                }
-            } else {
+                Spacer(modifier = Modifier.height(8.dp))
                 Surface(
                     shape = MaterialTheme.shapes.medium,
                     color = Color.Black.copy(alpha = 0.55f),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
-                        text = "等待场景识别结果…",
-                        modifier = Modifier.padding(14.dp),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White
-                    )
+                    Row(
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Surface(
+                            shape = MaterialTheme.shapes.small,
+                            color = Color.White.copy(alpha = 0.12f),
+                            modifier = Modifier.size(44.dp)
+                        ) {
+                            PoseFigure(
+                                figure = pose.figure,
+                                modifier = Modifier.padding(4.dp),
+                                color = Color.White
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = pose.name,
+                                style = MaterialTheme.typography.titleSmall,
+                                color = Color.White
+                            )
+                            Text(
+                                text = "${pose.figure.facing.zh} · ${pose.camera.zh}" +
+                                    if (vm.currentSpec?.verified == true) " · 角度已校准" else "",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color.White.copy(alpha = 0.7f)
+                            )
+                        }
+                        TextButton(onClick = { showSteps = !showSteps }) {
+                            Text(
+                                text = if (showSteps) "收起" else "步骤",
+                                color = Color.White,
+                                style = MaterialTheme.typography.labelLarge
+                            )
+                        }
+                    }
+
+                    if (showSteps) {
+                        Column(
+                            modifier = Modifier
+                                .padding(horizontal = 12.dp)
+                                .padding(bottom = 10.dp)
+                                .height(120.dp)
+                                .verticalScroll(rememberScrollState())
+                        ) {
+                            pose.steps.forEachIndexed { index, step ->
+                                Text(
+                                    text = "${index + 1}. $step",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Color.White.copy(alpha = 0.9f),
+                                    modifier = Modifier.padding(vertical = 2.dp)
+                                )
+                            }
+                        }
+                    }
                 }
             }
 
@@ -267,7 +332,8 @@ fun CameraScreen(vm: SceneViewModel) {
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 TextButton(onClick = { showGuides = !showGuides }) {
                     Text(
@@ -276,14 +342,12 @@ fun CameraScreen(vm: SceneViewModel) {
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
-                if (vm.latencyMs > 0f) {
-                    Text(
-                        text = "识别 %.0f ms".format(vm.latencyMs),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.White.copy(alpha = 0.7f),
-                        modifier = Modifier.padding(start = 12.dp, top = 12.dp)
-                    )
-                }
+                Text(
+                    text = "场景 %.0fms · 姿态 %.0fms".format(vm.latencyMs, vm.poseLatencyMs),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.White.copy(alpha = 0.7f),
+                    modifier = Modifier.padding(start = 10.dp)
+                )
             }
         }
     }

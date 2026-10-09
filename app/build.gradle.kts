@@ -23,9 +23,10 @@ android {
         }
     }
 
-    // 模型文件别压缩，避免 asset 解压开销与 mmap 问题
+    // 模型文件别压缩，避免 asset 解压开销与 mmap 问题。
+    // `.task` 必须在里面 —— MediaPipe 从 assets 加载时遇到压缩过的文件会直接失败。
     androidResources {
-        noCompress += listOf("onnx", "tflite")
+        noCompress += listOf("onnx", "tflite", "task")
     }
 
     buildTypes {
@@ -90,6 +91,9 @@ dependencies {
     //   Places365 场景分类 + NIMA 美学评分
     // 去掉 ONNX Runtime 后 APK 少了约 30 MB
     implementation("org.tensorflow:tensorflow-lite:2.16.1")
+
+    // L1 姿态层。锁死版本号：用 latest.release 会在某次自动升级里引入不兼容
+    implementation("com.google.mediapipe:tasks-vision:0.10.14")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 }

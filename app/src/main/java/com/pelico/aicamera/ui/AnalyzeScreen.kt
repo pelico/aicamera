@@ -75,48 +75,71 @@ fun AnalyzeScreen(vm: SceneViewModel) {
             )
         }
 
-        val scene = vm.currentScene
-        if (scene != null) {
-            Spacer(modifier = Modifier.height(14.dp))
-            Text(
-                text = "识别场景：${scene.zh}（${(scene.prob * 100).toInt()}%）",
-                style = MaterialTheme.typography.titleMedium
-            )
-            Text(
-                text = "原始标签 ${scene.label} · ${scene.group.zh}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            vm.lighting?.let {
+            val scene = vm.scene
+            if (scene != null) {
+                Spacer(modifier = Modifier.height(14.dp))
                 Text(
-                    text = it.describe(),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    text = "识别场景：${scene.coarse.zh}（${(scene.coarseProb * 100).toInt()}%）",
+                    style = MaterialTheme.typography.titleMedium
                 )
-            }
-            com.pelico.aicamera.engine.SceneLabels.localHint(scene.label)?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-            if (vm.aesthetic > 0f) {
-                Text(
-                    text = "美学评分 %.2f / 10".format(vm.aesthetic),
-                    style = MaterialTheme.typography.titleSmall
-                )
-            }
+                scene.top.firstOrNull()?.let { top ->
+                    Text(
+                        text = "细粒度 ${top.zh} · ${top.label}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                vm.person?.let { p ->
+                    Text(
+                        text = "人物：${p.shotSize.zh} · ${p.facing.zh} · 占画面 %.0f%%".format(p.heightRatio * 100),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                vm.lighting?.let {
+                    Text(
+                        text = it.describe(),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                scene.top.firstOrNull()?.let { top ->
+                    com.pelico.aicamera.engine.SceneLabels.localHint(top.label)?.let { hint ->
+                        Text(
+                            text = hint,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+                if (vm.aesthetic > 0f) {
+                    Text(
+                        text = "美学评分 %.2f / 10".format(vm.aesthetic),
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                }
 
-            Spacer(modifier = Modifier.height(10.dp))
-            Text(
-                text = "下次在这儿可以这样拍：",
-                style = MaterialTheme.typography.titleMedium
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            vm.poses.forEach { scored ->
-                PoseCard(scored = scored, modifier = Modifier.padding(bottom = 10.dp))
-            }
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = "如果重拍这张，最该改的是：",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                vm.guidance?.let { g ->
+                    GuidanceBanner(
+                        guidance = g,
+                        modifier = Modifier.padding(bottom = 10.dp)
+                    )
+                }
+                Text(
+                    text = "下次在这儿可以这样拍：",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(top = 6.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                vm.poses.forEach { scored ->
+                    PoseCard(scored = scored, modifier = Modifier.padding(bottom = 10.dp))
+                }
         } else if (photo != null) {
             Spacer(modifier = Modifier.height(14.dp))
             Text("正在分析…", style = MaterialTheme.typography.bodyMedium)

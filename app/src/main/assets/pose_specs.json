@@ -1,0 +1,416 @@
+{
+  "version": 1,
+  "note": "每条对应 PoseLibrary 里的一个模板 id。target_cx / target_foot_y / bbox_h_ratio 是画面归一化坐标（y 轴向下）；angles 的单位：ABDUCT/ELBOW/KNEE/TORSO_LEAN 为度，LEG_SPREAD 为踝间距/髋宽×100，HEAD_TURN 为鼻尖相对肩中点偏心/肩宽×200（0=正对，约100=完全侧转）。全部条目的 verified 目前为 false —— 角度是从几何关系推出的初值，需要真机采样校准后才能翻 true。校准办法：性能实测页的『复制当前角度』按钮。",
+  "items": [
+    {
+      "id": "water_rock_sit",
+      "name": "礁石上远眺",
+      "target_cx": 0.66,
+      "target_foot_y": 0.72,
+      "bbox_h_ratio": 0.4,
+      "shot_size": "FULL",
+      "facing": "SIDE_90",
+      "mirrored": true,
+      "angles": {
+        "ARM_R_ABDUCT": 95,
+        "ARM_L_ABDUCT": 45,
+        "ELBOW_R": 168,
+        "KNEE_L": 110,
+        "KNEE_R": 150,
+        "TORSO_LEAN": -12,
+        "LEG_SPREAD": 55
+      },
+      "tol": {
+        "ARM_R_ABDUCT": 30,
+        "ARM_L_ABDUCT": 25,
+        "ELBOW_R": 25,
+        "KNEE_L": 30,
+        "KNEE_R": 30,
+        "TORSO_LEAN": 12,
+        "LEG_SPREAD": 30
+      },
+      "weights": {
+        "ARM_R_ABDUCT": 1.0,
+        "ARM_L_ABDUCT": 0.5,
+        "ELBOW_R": 0.5,
+        "KNEE_L": 0.9,
+        "KNEE_R": 0.9,
+        "TORSO_LEAN": 0.8,
+        "LEG_SPREAD": 0.5
+      },
+      "verified": false
+    },
+    {
+      "id": "mtn_ridge_silhouette",
+      "name": "山脊线上剪影",
+      "target_cx": 0.38,
+      "target_foot_y": 0.62,
+      "bbox_h_ratio": 0.3,
+      "shot_size": "LONG",
+      "facing": "SIDE_90",
+      "mirrored": true,
+      "angles": {
+        "ARM_L_ABDUCT": 25,
+        "ARM_R_ABDUCT": 20,
+        "ELBOW_L": 170,
+        "ELBOW_R": 172,
+        "KNEE_L": 176,
+        "KNEE_R": 176,
+        "TORSO_LEAN": 0,
+        "LEG_SPREAD": 40
+      },
+      "tol": {
+        "ARM_L_ABDUCT": 20,
+        "ARM_R_ABDUCT": 20,
+        "ELBOW_L": 20,
+        "ELBOW_R": 20,
+        "KNEE_L": 15,
+        "KNEE_R": 15,
+        "TORSO_LEAN": 8,
+        "LEG_SPREAD": 25
+      },
+      "weights": {
+        "ARM_L_ABDUCT": 0.6,
+        "ARM_R_ABDUCT": 0.6,
+        "ELBOW_L": 0.4,
+        "ELBOW_R": 0.4,
+        "KNEE_L": 0.6,
+        "KNEE_R": 0.6,
+        "TORSO_LEAN": 0.5,
+        "LEG_SPREAD": 0.5
+      },
+      "verified": false
+    },
+    {
+      "id": "mtn_summit_arms",
+      "name": "山顶俯拍张开",
+      "target_cx": 0.5,
+      "target_foot_y": 0.8,
+      "bbox_h_ratio": 0.46,
+      "shot_size": "FULL",
+      "facing": "FRONT",
+      "mirrored": true,
+      "angles": {
+        "ARM_L_ABDUCT": 95,
+        "ARM_R_ABDUCT": 95,
+        "ELBOW_L": 172,
+        "ELBOW_R": 172,
+        "KNEE_L": 175,
+        "KNEE_R": 175,
+        "TORSO_LEAN": 0,
+        "LEG_SPREAD": 55
+      },
+      "tol": {
+        "ARM_L_ABDUCT": 25,
+        "ARM_R_ABDUCT": 25,
+        "ELBOW_L": 20,
+        "ELBOW_R": 20,
+        "KNEE_L": 15,
+        "KNEE_R": 15,
+        "TORSO_LEAN": 8,
+        "LEG_SPREAD": 25
+      },
+      "weights": {
+        "ARM_L_ABDUCT": 1.2,
+        "ARM_R_ABDUCT": 1.2,
+        "ELBOW_L": 0.5,
+        "ELBOW_R": 0.5,
+        "KNEE_L": 0.5,
+        "KNEE_R": 0.5,
+        "TORSO_LEAN": 0.4,
+        "LEG_SPREAD": 0.5
+      },
+      "verified": false
+    },
+    {
+      "id": "forest_light_spot",
+      "name": "林间光斑侧身",
+      "target_cx": 0.42,
+      "target_foot_y": 0.82,
+      "bbox_h_ratio": 0.52,
+      "shot_size": "FULL",
+      "facing": "SIDE_45",
+      "mirrored": true,
+      "angles": {
+        "ARM_L_ABDUCT": 40,
+        "ARM_R_ABDUCT": 18,
+        "ELBOW_L": 165,
+        "ELBOW_R": 170,
+        "KNEE_L": 174,
+        "KNEE_R": 176,
+        "TORSO_LEAN": 10,
+        "LEG_SPREAD": 45
+      },
+      "tol": {
+        "ARM_L_ABDUCT": 20,
+        "ARM_R_ABDUCT": 20,
+        "ELBOW_L": 22,
+        "ELBOW_R": 22,
+        "KNEE_L": 15,
+        "KNEE_R": 15,
+        "TORSO_LEAN": 10,
+        "LEG_SPREAD": 25
+      },
+      "weights": {
+        "ARM_L_ABDUCT": 0.9,
+        "ARM_R_ABDUCT": 0.5,
+        "ELBOW_L": 0.5,
+        "ELBOW_R": 0.4,
+        "KNEE_L": 0.5,
+        "KNEE_R": 0.5,
+        "TORSO_LEAN": 0.7,
+        "LEG_SPREAD": 0.5
+      },
+      "verified": false
+    },
+    {
+      "id": "forest_tree_lean",
+      "name": "树干旁半倚",
+      "target_cx": 0.36,
+      "target_foot_y": 0.84,
+      "bbox_h_ratio": 0.5,
+      "shot_size": "FULL",
+      "facing": "SIDE_45",
+      "mirrored": true,
+      "angles": {
+        "ARM_L_ABDUCT": 70,
+        "ARM_R_ABDUCT": 18,
+        "ELBOW_L": 140,
+        "ELBOW_R": 168,
+        "KNEE_L": 172,
+        "KNEE_R": 178,
+        "TORSO_LEAN": 16,
+        "LEG_SPREAD": 40
+      },
+      "tol": {
+        "ARM_L_ABDUCT": 25,
+        "ARM_R_ABDUCT": 20,
+        "ELBOW_L": 28,
+        "ELBOW_R": 22,
+        "KNEE_L": 15,
+        "KNEE_R": 15,
+        "TORSO_LEAN": 12,
+        "LEG_SPREAD": 25
+      },
+      "weights": {
+        "ARM_L_ABDUCT": 1.1,
+        "ARM_R_ABDUCT": 0.4,
+        "ELBOW_L": 0.8,
+        "ELBOW_R": 0.4,
+        "KNEE_L": 0.5,
+        "KNEE_R": 0.5,
+        "TORSO_LEAN": 1.0,
+        "LEG_SPREAD": 0.4
+      },
+      "verified": false
+    },
+    {
+      "id": "field_wheat_arms",
+      "name": "麦田张开双臂",
+      "target_cx": 0.5,
+      "target_foot_y": 0.84,
+      "bbox_h_ratio": 0.46,
+      "shot_size": "FULL",
+      "facing": "FRONT",
+      "mirrored": true,
+      "angles": {
+        "ARM_L_ABDUCT": 100,
+        "ARM_R_ABDUCT": 100,
+        "ELBOW_L": 175,
+        "ELBOW_R": 175,
+        "KNEE_L": 176,
+        "KNEE_R": 176,
+        "TORSO_LEAN": 0,
+        "LEG_SPREAD": 50
+      },
+      "tol": {
+        "ARM_L_ABDUCT": 25,
+        "ARM_R_ABDUCT": 25,
+        "ELBOW_L": 18,
+        "ELBOW_R": 18,
+        "KNEE_L": 14,
+        "KNEE_R": 14,
+        "TORSO_LEAN": 8,
+        "LEG_SPREAD": 25
+      },
+      "weights": {
+        "ARM_L_ABDUCT": 1.3,
+        "ARM_R_ABDUCT": 1.3,
+        "ELBOW_L": 0.5,
+        "ELBOW_R": 0.5,
+        "KNEE_L": 0.5,
+        "KNEE_R": 0.5,
+        "TORSO_LEAN": 0.4,
+        "LEG_SPREAD": 0.5
+      },
+      "verified": false
+    },
+    {
+      "id": "street_wall_lean",
+      "name": "街头靠墙站",
+      "target_cx": 0.36,
+      "target_foot_y": 0.86,
+      "bbox_h_ratio": 0.54,
+      "shot_size": "FULL",
+      "facing": "SIDE_45",
+      "mirrored": true,
+      "angles": {
+        "ARM_L_ABDUCT": 25,
+        "ARM_R_ABDUCT": 15,
+        "ELBOW_L": 150,
+        "ELBOW_R": 165,
+        "KNEE_L": 165,
+        "KNEE_R": 150,
+        "TORSO_LEAN": 12,
+        "LEG_SPREAD": 60
+      },
+      "tol": {
+        "ARM_L_ABDUCT": 22,
+        "ARM_R_ABDUCT": 20,
+        "ELBOW_L": 25,
+        "ELBOW_R": 22,
+        "KNEE_L": 22,
+        "KNEE_R": 25,
+        "TORSO_LEAN": 10,
+        "LEG_SPREAD": 28
+      },
+      "weights": {
+        "ARM_L_ABDUCT": 0.6,
+        "ARM_R_ABDUCT": 0.4,
+        "ELBOW_L": 0.7,
+        "ELBOW_R": 0.5,
+        "KNEE_L": 0.7,
+        "KNEE_R": 0.9,
+        "TORSO_LEAN": 0.9,
+        "LEG_SPREAD": 0.6
+      },
+      "verified": false
+    },
+    {
+      "id": "night_neon_profile",
+      "name": "霓虹下侧脸",
+      "target_cx": 0.4,
+      "target_foot_y": 0.82,
+      "bbox_h_ratio": 0.46,
+      "shot_size": "FULL",
+      "facing": "SIDE_90",
+      "mirrored": true,
+      "angles": {
+        "ARM_L_ABDUCT": 20,
+        "ARM_R_ABDUCT": 15,
+        "ELBOW_L": 170,
+        "ELBOW_R": 172,
+        "KNEE_L": 176,
+        "KNEE_R": 176,
+        "TORSO_LEAN": 0,
+        "HEAD_TURN": 70,
+        "LEG_SPREAD": 35
+      },
+      "tol": {
+        "ARM_L_ABDUCT": 20,
+        "ARM_R_ABDUCT": 20,
+        "ELBOW_L": 22,
+        "ELBOW_R": 22,
+        "KNEE_L": 14,
+        "KNEE_R": 14,
+        "TORSO_LEAN": 8,
+        "HEAD_TURN": 30,
+        "LEG_SPREAD": 22
+      },
+      "weights": {
+        "ARM_L_ABDUCT": 0.5,
+        "ARM_R_ABDUCT": 0.4,
+        "ELBOW_L": 0.4,
+        "ELBOW_R": 0.4,
+        "KNEE_L": 0.4,
+        "KNEE_R": 0.4,
+        "TORSO_LEAN": 0.4,
+        "HEAD_TURN": 1.4,
+        "LEG_SPREAD": 0.4
+      },
+      "verified": false
+    },
+    {
+      "id": "arch_gate_center",
+      "name": "古建门前正中站",
+      "target_cx": 0.5,
+      "target_foot_y": 0.86,
+      "bbox_h_ratio": 0.44,
+      "shot_size": "FULL",
+      "facing": "FRONT",
+      "mirrored": true,
+      "angles": {
+        "ARM_L_ABDUCT": 15,
+        "ARM_R_ABDUCT": 15,
+        "ELBOW_L": 172,
+        "ELBOW_R": 172,
+        "KNEE_L": 177,
+        "KNEE_R": 177,
+        "TORSO_LEAN": 0,
+        "LEG_SPREAD": 35
+      },
+      "tol": {
+        "ARM_L_ABDUCT": 15,
+        "ARM_R_ABDUCT": 15,
+        "ELBOW_L": 15,
+        "ELBOW_R": 15,
+        "KNEE_L": 10,
+        "KNEE_R": 10,
+        "TORSO_LEAN": 6,
+        "LEG_SPREAD": 20
+      },
+      "weights": {
+        "ARM_L_ABDUCT": 0.6,
+        "ARM_R_ABDUCT": 0.6,
+        "ELBOW_L": 0.5,
+        "ELBOW_R": 0.5,
+        "KNEE_L": 0.6,
+        "KNEE_R": 0.6,
+        "TORSO_LEAN": 0.8,
+        "LEG_SPREAD": 0.5
+      },
+      "verified": false
+    },
+    {
+      "id": "gen_thirds_stand",
+      "name": "通用三分站姿",
+      "target_cx": 0.33,
+      "target_foot_y": 0.86,
+      "bbox_h_ratio": 0.56,
+      "shot_size": "MEDIUM",
+      "facing": "SIDE_45",
+      "mirrored": true,
+      "angles": {
+        "ARM_L_ABDUCT": 30,
+        "ARM_R_ABDUCT": 16,
+        "ELBOW_L": 160,
+        "ELBOW_R": 170,
+        "KNEE_L": 172,
+        "KNEE_R": 162,
+        "TORSO_LEAN": 6,
+        "LEG_SPREAD": 50
+      },
+      "tol": {
+        "ARM_L_ABDUCT": 20,
+        "ARM_R_ABDUCT": 18,
+        "ELBOW_L": 25,
+        "ELBOW_R": 22,
+        "KNEE_L": 18,
+        "KNEE_R": 22,
+        "TORSO_LEAN": 10,
+        "LEG_SPREAD": 25
+      },
+      "weights": {
+        "ARM_L_ABDUCT": 0.7,
+        "ARM_R_ABDUCT": 0.4,
+        "ELBOW_L": 0.6,
+        "ELBOW_R": 0.4,
+        "KNEE_L": 0.6,
+        "KNEE_R": 0.8,
+        "TORSO_LEAN": 0.6,
+        "LEG_SPREAD": 0.5
+      },
+      "verified": false
+    }
+  ]
+}

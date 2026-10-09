@@ -26,12 +26,15 @@ object PoseMatcher {
     private const val GROUP_HIT = 1.5f
     private const val TIME_BONUS = 1.2f
     private const val LIGHT_BONUS = 1.0f
+    /** 有 pose_spec 的模板优先：只有它们能进「摆到位了」的闭环 */
+    private const val SPEC_BONUS = 2.0f
 
     fun rank(
         predictions: List<ScenePrediction>,
         lighting: Lighting,
         pool: List<PoseTemplate> = PoseLibrary.ALL,
-        limit: Int = 3
+        limit: Int = 3,
+        boost: Set<String> = emptySet()
     ): List<ScoredPose> {
         if (predictions.isEmpty()) {
             return pool.filter { it.group == SceneGroup.GENERAL }
@@ -78,6 +81,10 @@ object PoseMatcher {
             if (template.lights.isNotEmpty() && lighting.quality in template.lights) {
                 score += LIGHT_BONUS
                 reasons.add("适合${lighting.quality.zh}")
+            }
+            if (boost.contains(template.id)) {
+                score += SPEC_BONUS
+                reasons.add("可校准")
             }
 
             ScoredPose(template, score, reasons)

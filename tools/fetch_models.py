@@ -42,6 +42,13 @@ FILES = [
         6_833,
         "Places365 类别名",
     ),
+    (
+        "pose_landmarker_lite.task",
+        "https://storage.googleapis.com/mediapipe-models/pose_landmarker/"
+        "pose_landmarker_lite/float16/1/pose_landmarker_lite.task",
+        5_777_746,
+        "MediaPipe Pose Landmarker lite · Apache-2.0",
+    ),
 ]
 
 

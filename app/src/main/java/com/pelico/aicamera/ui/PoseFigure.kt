@@ -11,11 +11,16 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import com.pelico.aicamera.contract.LmPoint
+import com.pelico.aicamera.contract.PersonResult
 import com.pelico.aicamera.engine.BodyFacing
 import com.pelico.aicamera.engine.FigurePose
 import com.pelico.aicamera.engine.Placement
+import com.pelico.aicamera.util.contentRect
+import com.pelico.aicamera.util.project
 import kotlin.math.abs
 import kotlin.math.cos
+import kotlin.math.maxOf
 import kotlin.math.sin
 
 /**
@@ -184,35 +189,47 @@ fun PoseFigure(
 }
 
 /**
- * 取景叠加层：三分参考线 + 站位框 + 人形剪影 + 水平仪。
- * 全部是确定性几何，不会像回归式构图框那样抖动。
+ * 取景叠加层：三分参考线 + 目标站位框 + 实际人物框/骨架 + 水平仪。
+ *
+ * 所有元素都画在 [contentRect] 里 —— 那是 PreviewView 上画面真正可见的区域，
+ * 而不是 Compose 的全屏尺寸。改这一个地方就能修掉「高瘦屏上引导整体错位」的问题。
+ *
+ * 目标框（虚线）是模板给出的站位，实线框是 MediaPipe 检到的真实人物：
+ * 两条框重合就说明站位对了，比任何文字描述都直观。
  */
 @Composable
 fun SceneOverlay(
     placement: Placement?,
     figure: FigurePose?,
+    person: PersonResult?,
     showThirds: Boolean,
     tiltDeg: Float,
+    srcAspect: Float,
+    progress: Float,
     modifier: Modifier = Modifier
 ) {
     Canvas(modifier = modifier) {
-        val w = size.width
-        val h = size.height
+        val area = contentRect(size.width, size.height, srcAspect)
+        val w = area.width
+        val h = area.height
+        if (w <= 0f || h <= 0f) return@Canvas
 
         if (showThirds) {
             val guide = Color.White.copy(alpha = 0.22f)
             val sw = 1.5f
-            drawLine(guide, Offset(w / 3f, 0f), Offset(w / 3f, h), sw)
-            drawLine(guide, Offset(2f * w / 3f, 0f), Offset(2f * w / 3f, h), sw)
-            drawLine(guide, Offset(0f, h / 3f), Offset(w, h / 3f), sw)
-            drawLine(guide, Offset(0f, 2f * h / 3f), Offset(w, 2f * h / 3f), sw)
+            for (i in 1..2) {
+                val x = area.left + w * i / 3f
+                drawLine(guide, Offset(x, area.top), Offset(x, area.bottom), sw)
+                val y = area.top + h * i / 3f
+                drawLine(guide, Offset(area.left, y), Offset(area.right, y), sw)
+            }
         }
 
         placement?.let { p ->
             val boxH = p.height * h
             val boxW = boxH * 0.42f
-            val left = p.cx * w - boxW / 2f
-            val top = p.footY * h - boxH
+            val left = area.left + p.cx * w - boxW / 2f
+            val top = area.top + p.footY * h - boxH
 
             drawRect(
                 color = Color(0xFF7CE8C4).copy(alpha = 0.85f),
@@ -227,9 +244,27 @@ fun SceneOverlay(
             figure?.let { drawFigure(it, Rect(left, top, left + boxW, top + boxH), Color(0xFF7CE8C4)) }
         }
 
+        person?.let { p ->
+            val okColor = Color(0xFF5DDC9A)
+            val warmColor = Color(0xFFEFB13F)
+            val tone = if (progress > 0.8f) okColor else warmColor
+            val left = area.left + p.bbox.left * w
+            val top = area.top + p.bbox.top * h
+            val boxW = (p.bbox.right - p.bbox.left).coerceAtLeast(0f) * w
+            val boxH = (p.bbox.bottom - p.bbox.top).coerceAtLeast(0f) * h
+
+            drawRect(
+                color = tone.copy(alpha = 0.55f),
+                topLeft = Offset(left, top),
+                size = Size(boxW, boxH),
+                style = Stroke(width = 2f)
+            )
+            drawSkeleton(p.landmarks, area, tone)
+        }
+
         // 水平仪：虚线是参考水平，实线跟着机身转，两条重合就是正的
-        val cx = w / 2f
-        val y = h * 0.13f
+        val cx = size.width / 2f
+        val y = area.top + h * 0.06f
         val len = w * 0.16f
         drawLine(
             color = Color.White.copy(alpha = 0.35f),
@@ -248,5 +283,30 @@ fun SceneOverlay(
             strokeWidth = 3.5f,
             cap = StrokeCap.Round
         )
+    }
+}
+
+/** MediaPipe 的骨架连线子集：够看清姿态，不画手脚步的碎点 */
+private val SKELETON = listOf(
+    11 to 12, 11 to 13, 13 to 15, 12 to 14, 14 to 16,
+    11 to 23, 12 to 24, 23 to 24,
+    23 to 25, 25 to 27, 24 to 26, 26 to 28
+)
+
+private fun DrawScope.drawSkeleton(points: List<LmPoint>, area: Rect, color: Color) {
+    if (points.size < 33) return
+    val sw = maxOf(2f, area.width * 0.006f)
+    for ((a, b) in SKELETON) {
+        drawLine(
+            color = color.copy(alpha = 0.9f),
+            start = area.project(points[a].x, points[a].y),
+            end = area.project(points[b].x, points[b].y),
+            strokeWidth = sw,
+            cap = StrokeCap.Round
+        )
+    }
+    val r = maxOf(2f, area.width * 0.008f)
+    for (idx in intArrayOf(0, 11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28)) {
+        drawCircle(color = color, radius = r, center = area.project(points[idx].x, points[idx].y))
     }
 }
